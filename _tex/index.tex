@@ -425,13 +425,13 @@ where \(z\) is a dobly noisy data defined by \(z=y+n_s\).
 
 The loss function is
 
-\[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\mathbb{E} \left(||A_\theta (z)-y'||^2_2\right)\]
+\[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\underset{(z_1,z_2)}{\mathbb{E}} \left(||A_\theta (z)-z||^2_2\right)\]
 
 and the inference scheme is
 
-\[x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_\theta(z)-z}{\alpha^2}\]
+\[x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_{\hat{\theta}}(z)-z}{\alpha^2}\]
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, coltitle=black, bottomtitle=1mm, breakable, arc=.35mm, toprule=.15mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, colframe=quarto-callout-note-color-frame, opacitybacktitle=0.6, leftrule=.75mm, toptitle=1mm, bottomrule=.15mm, titlerule=0mm, left=2mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white]
+\begin{tcolorbox}[enhanced jigsaw, breakable, colframe=quarto-callout-note-color-frame, bottomrule=.15mm, opacitybacktitle=0.6, coltitle=black, titlerule=0mm, leftrule=.75mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, bottomtitle=1mm, colback=white, toprule=.15mm, arc=.35mm, rightrule=.15mm, toptitle=1mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, opacityback=0]
 
 This approach has no restriction on noise except additive one. But the
 noise level may high. To mitigate this artificially high noise, lower
@@ -475,7 +475,7 @@ iterative formula for \(\theta\) update is:
 
 \[\theta^{n+1}=\theta_n-\eta \nabla \hat{\theta}\]
 
-Here \(theta_0\), the initial parameter measure is found by manually
+Here \(\theta_0\), the initial parameter measure is found by manually
 tuning \(\theta\) for a single image.
 
 \subsubsection{Presented use case}\label{presented-use-case}

@@ -304,9 +304,9 @@ window.Quarto = {
 <li><em>Noiser to Noise</em>: <span class="citation" data-cites="9156650">(<a href="#ref-9156650" role="doc-biblioref">Moran et al. 2020</a>)</span></li>
 </ol>
 <p>The loss function is</p>
-<p><span class="math display">\[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\mathbb{E} \left(||A_\theta (z)-y'||^2_2\right)\]</span></p>
+<p><span class="math display">\[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\underset{(z_1,z_2)}{\mathbb{E}} \left(||A_\theta (z)-z||^2_2\right)\]</span></p>
 <p>and the inference scheme is</p>
-<p><span class="math display">\[x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_\theta(z)-z}{\alpha^2}\]</span></p>
+<p><span class="math display">\[x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_{\hat{\theta}}(z)-z}{\alpha^2}\]</span></p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -336,7 +336,7 @@ z_2&amp;=y-D^{-1}n_s
 <h3 data-number="3.4.1" class="anchored" data-anchor-id="optimization-of-loss-function"><span class="header-section-number">3.4.1</span> Optimization of loss function</h3>
 <p>For the optimization, the authors used gradient based approach. For the evaluation of gradient, they used automatic differentiation and the iterative formula for <span class="math inline">\(\theta\)</span> update is:</p>
 <p><span class="math display">\[\theta^{n+1}=\theta_n-\eta \nabla \hat{\theta}\]</span></p>
-<p>Here <span class="math inline">\(theta_0\)</span>, the initial parameter measure is found by manually tuning <span class="math inline">\(\theta\)</span> for a single image.</p>
+<p>Here <span class="math inline">\(\theta_0\)</span>, the initial parameter measure is found by manually tuning <span class="math inline">\(\theta\)</span> for a single image.</p>
 </section>
 <section id="presented-use-case" class="level3" data-number="3.4.2">
 <h3 data-number="3.4.2" class="anchored" data-anchor-id="presented-use-case"><span class="header-section-number">3.4.2</span> Presented use case</h3>
@@ -902,7 +902,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","openEffect":"zoom","loop":false,"closeEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","openEffect":"zoom","descPosition":"bottom","closeEffect":"zoom","loop":false});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {
