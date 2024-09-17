@@ -132,11 +132,11 @@ where $z$ is a dobly noisy data defined by $z=y+n_s$.
 
 The loss function is
 
-$$ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\mathbb{E} \left(||A_\theta (z)-y'||^2_2\right)$$
+$$ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\underset{(z_1,z_2)}{\mathbb{E}} \left(||A_\theta (z)-z||^2_2\right)$$
 
 and the inference scheme is 
 
-$$x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_\theta(z)-z}{\alpha^2}$$
+$$x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_{\hat{\theta}}(z)-z}{\alpha^2}$$
 
 :::{.callout-note}
 
@@ -169,7 +169,7 @@ For the optimization, the authors used gradient based approach. For the evaluati
 
 $$\theta^{n+1}=\theta_n-\eta \nabla \hat{\theta}$$
 
-Here $theta_0$, the initial parameter measure is found by manually tuning $\theta$ for a single image.
+Here $\theta_0$, the initial parameter measure is found by manually tuning $\theta$ for a single image.
 
 ### Presented use case
 
