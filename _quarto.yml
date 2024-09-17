@@ -1,0 +1,22 @@
+project:
+  type: manuscript
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    theme: solar
+    toc: true
+    comments:
+      hypothesis: true
+  docx: default
+  jats: default
+  agu-pdf:
+    include-in-header:
+      - text: |
+          \usepackage{amsmath}
+          \usepackage{mathtools}
+
+
+
