@@ -1351,7 +1351,7 @@ Instead of using the default optimizer, let's try the finite difference approach
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-clean_image = cv2.imread('/manuscript-template-vscode-main/images/first.png', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1461,6 +1461,361 @@ plt.axis('off')
 plt.tight_layout()
 plt.show()
 ```
+
+```{python}
+#| label: fig-denoising2-plot
+#| fig-cap: Example of denoising results.
+#| fig-alt: A visualization of parameter fine tuning.
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+clean_image = cv2.imread('/Denoising-Manuscript/images/second.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)  # Ensure size is at least 1
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Gradient descent optimizer
+def gradient_descent(noisy_image1, noisy_image2, initial_theta, alpha=0.01, iterations=100):
+    theta = np.array(initial_theta)
+    for _ in range(iterations):
+        grad_kernel, grad_sigma = compute_gradients(noisy_image1, noisy_image2, theta)
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+        theta[0] = valid_kernel_size(theta[0])
+    return theta
+
+# Compute numerical gradients
+def compute_gradients(noisy_image1, noisy_image2, theta):
+    epsilon = 1e-5
+    cost_1 = cost_function([theta[0] + epsilon, theta[1]], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0] - epsilon, theta[1]], noisy_image1, noisy_image2)
+    grad_kernel = (cost_1 - cost_2) / (2 * epsilon)
+    
+    cost_1 = cost_function([theta[0], theta[1] + epsilon], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0], theta[1] - epsilon], noisy_image1, noisy_image2)
+    grad_sigma = (cost_1 - cost_2) / (2 * epsilon)
+    
+    return grad_kernel, grad_sigma
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Using scipy's minimize function
+initial_theta = [15, 1]  # Initial guess for kernel size and sigmaX
+result = minimize(cost_function, initial_theta, args=(noisy_images[0], noisy_images[1]), method='BFGS')
+optimized_theta_scipy = result.x
+optimized_denoised_image_scipy = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_scipy[0]), optimized_theta_scipy[1])
+
+# Using manual gradient descent optimization
+optimized_theta_gd = gradient_descent(noisy_images[0], noisy_images[1], initial_theta, alpha=0.01, iterations=100)
+optimized_denoised_image_gd = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_gd[0]), optimized_theta_gd[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_scipy = compute_psnr(optimized_denoised_image_scipy, clean_image)
+psnr_gd = compute_psnr(optimized_denoised_image_gd, clean_image)
+psnr_noisy=compute_psnr(noisy_images[0], clean_image)
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image-1\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_scipy, cmap='gray')
+plt.title(f'Scipy Optimizer\nPSNR: {psnr_scipy:.2f}')
+plt.axis('off')
+# Plot denoised image by manual gradient descent
+plt.subplot(2, 2, 3)
+plt.imshow(optimized_denoised_image_gd, cmap='gray')
+plt.title(f'Gradient Descent\nPSNR: {psnr_gd:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-denoising3-plot
+#| fig-cap: Example of denoising results.
+#| fig-alt: A visualization of parameter fine tuning.
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+clean_image = cv2.imread('/Denoising-Manuscript/images/third.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)  # Ensure size is at least 1
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Gradient descent optimizer
+def gradient_descent(noisy_image1, noisy_image2, initial_theta, alpha=0.01, iterations=100):
+    theta = np.array(initial_theta)
+    for _ in range(iterations):
+        grad_kernel, grad_sigma = compute_gradients(noisy_image1, noisy_image2, theta)
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+        theta[0] = valid_kernel_size(theta[0])
+    return theta
+
+# Compute numerical gradients
+def compute_gradients(noisy_image1, noisy_image2, theta):
+    epsilon = 1e-5
+    cost_1 = cost_function([theta[0] + epsilon, theta[1]], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0] - epsilon, theta[1]], noisy_image1, noisy_image2)
+    grad_kernel = (cost_1 - cost_2) / (2 * epsilon)
+    
+    cost_1 = cost_function([theta[0], theta[1] + epsilon], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0], theta[1] - epsilon], noisy_image1, noisy_image2)
+    grad_sigma = (cost_1 - cost_2) / (2 * epsilon)
+    
+    return grad_kernel, grad_sigma
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Using scipy's minimize function
+initial_theta = [15, 1]  # Initial guess for kernel size and sigmaX
+result = minimize(cost_function, initial_theta, args=(noisy_images[0], noisy_images[1]), method='BFGS')
+optimized_theta_scipy = result.x
+optimized_denoised_image_scipy = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_scipy[0]), optimized_theta_scipy[1])
+
+# Using manual gradient descent optimization
+optimized_theta_gd = gradient_descent(noisy_images[0], noisy_images[1], initial_theta, alpha=0.01, iterations=100)
+optimized_denoised_image_gd = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_gd[0]), optimized_theta_gd[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_scipy = compute_psnr(optimized_denoised_image_scipy, clean_image)
+psnr_gd = compute_psnr(optimized_denoised_image_gd, clean_image)
+psnr_noisy=compute_psnr(noisy_images[0], clean_image)
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image-1\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_scipy, cmap='gray')
+plt.title(f'Scipy Optimizer\nPSNR: {psnr_scipy:.2f}')
+plt.axis('off')
+# Plot denoised image by manual gradient descent
+plt.subplot(2, 2, 3)
+plt.imshow(optimized_denoised_image_gd, cmap='gray')
+plt.title(f'Gradient Descent\nPSNR: {psnr_gd:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-denoising4-plot
+#| fig-cap: Example of denoising results.
+#| fig-alt: A visualization of parameter fine tuning.
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+clean_image = cv2.imread('/Denoising-Manuscript/images/fourth.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)  # Ensure size is at least 1
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Gradient descent optimizer
+def gradient_descent(noisy_image1, noisy_image2, initial_theta, alpha=0.01, iterations=100):
+    theta = np.array(initial_theta)
+    for _ in range(iterations):
+        grad_kernel, grad_sigma = compute_gradients(noisy_image1, noisy_image2, theta)
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+        theta[0] = valid_kernel_size(theta[0])
+    return theta
+
+# Compute numerical gradients
+def compute_gradients(noisy_image1, noisy_image2, theta):
+    epsilon = 1e-5
+    cost_1 = cost_function([theta[0] + epsilon, theta[1]], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0] - epsilon, theta[1]], noisy_image1, noisy_image2)
+    grad_kernel = (cost_1 - cost_2) / (2 * epsilon)
+    
+    cost_1 = cost_function([theta[0], theta[1] + epsilon], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0], theta[1] - epsilon], noisy_image1, noisy_image2)
+    grad_sigma = (cost_1 - cost_2) / (2 * epsilon)
+    
+    return grad_kernel, grad_sigma
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Using scipy's minimize function
+initial_theta = [15, 1]  # Initial guess for kernel size and sigmaX
+result = minimize(cost_function, initial_theta, args=(noisy_images[0], noisy_images[1]), method='BFGS')
+optimized_theta_scipy = result.x
+optimized_denoised_image_scipy = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_scipy[0]), optimized_theta_scipy[1])
+
+# Using manual gradient descent optimization
+optimized_theta_gd = gradient_descent(noisy_images[0], noisy_images[1], initial_theta, alpha=0.01, iterations=100)
+optimized_denoised_image_gd = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_gd[0]), optimized_theta_gd[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_scipy = compute_psnr(optimized_denoised_image_scipy, clean_image)
+psnr_gd = compute_psnr(optimized_denoised_image_gd, clean_image)
+psnr_noisy=compute_psnr(noisy_images[0], clean_image)
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image-1\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_scipy, cmap='gray')
+plt.title(f'Scipy Optimizer\nPSNR: {psnr_scipy:.2f}')
+plt.axis('off')
+# Plot denoised image by manual gradient descent
+plt.subplot(2, 2, 3)
+plt.imshow(optimized_denoised_image_gd, cmap='gray')
+plt.title(f'Gradient Descent\nPSNR: {psnr_gd:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+```
+
 
 :::{.callout-warning}
 ## A Missing element

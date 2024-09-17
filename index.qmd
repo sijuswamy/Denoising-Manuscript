@@ -177,7 +177,13 @@ Authors used the proposed method on the denoiser, *Denoising via Quantum Interac
 
 {{< embed notebooks/review.qmd#fig-denoising-plot >}}
 
-Skill of the proposed alogorithm on the same sample image used by the author is shown in @fig-denoising-plot  
+{{< embed notebooks/review.qmd#fig-denoising2-plot >}}
+
+{{< embed notebooks/review.qmd#fig-denoising3-plot >}}
+
+{{< embed notebooks/review.qmd#fig-denoising4-plot >}}
+
+Skill of the proposed alogorithm on the same sample images used by the author is shown in @fig-denoising-plot  , @fig-denoising2-plot , @fig-denoising3-plot and @fig-denoising4-plot .
 
 # Conclusion
 
