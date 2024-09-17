@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="generator" content="quarto-1.5.56">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+    <meta name="author" content="Siju K S">
+
+    <title>Basics of Noise</title>
+    <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      ul.task-list{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+        vertical-align: middle;
+      }
+    </style>
+
+    <style>
+      body.hypothesis-enabled #quarto-embed-header {
+        padding-right: 36px;
+      }
+
+      #quarto-embed-header {
+        height: 3em;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: solid 1px;
+      }
+
+      #quarto-embed-header h6 {
+        font-size: 1.1em;
+        padding-top: 0.6em;
+        margin-left: 1em;
+        margin-right: 1em;
+        font-weight: 400;
+      }
+
+      #quarto-embed-header a.quarto-back-link,
+      #quarto-embed-header a.quarto-download-embed {
+        font-size: 0.8em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 1em;
+        margin-right: 1em;
+      }
+
+      .quarto-back-container {
+        padding-left: 0.5em;
+        display: flex;
+      }
+
+      .headroom {
+          will-change: transform;
+          transition: transform 200ms linear;
+      }
+
+      .headroom--pinned {
+          transform: translateY(0%);
+      }
+
+      .headroom--unpinned {
+          transform: translateY(-100%);
+      }      
+    </style>
+
+    <script>
+    window.document.addEventListener("DOMContentLoaded", function () {
+
+      var header = window.document.querySelector("#quarto-embed-header");
+      const titleBannerEl = window.document.querySelector("body > #title-block-header");
+      if (titleBannerEl) {
+        titleBannerEl.style.paddingTop = header.clientHeight + "px";
+      }
+      const contentEl = window.document.getElementById('quarto-content');
+      for (const child of contentEl.children) {
+        child.style.paddingTop = header.clientHeight + "px";
+        child.style.marginTop = "1em";
+      }
+
+      // Use the article root if the `back` call doesn't work. This isn't perfect
+      // but should typically work
+      window.quartoBackToArticle = () => {
+        var currentUrl = window.location.href;
+        window.history.back();
+        setTimeout(() => {
+            // if location was not changed in 100 ms, then there is no history back
+            if(currentUrl === window.location.href){              
+                // redirect to site root
+                window.location.href = "...html";
+            }
+        }, 100);
+      }
+
+      const headroom = new window.Headroom(header, {
+        tolerance: 5,
+        onPin: function () {
+        },
+        onUnpin: function () {
+        },
+      });
+      headroom.init();
+    });
+    </script>
+
+    
+<script src="../site_libs/manuscript-notebook/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+     <script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script> 
+      </head>
+
+  <body class="quarto-notebook">
+    <div id="quarto-embed-header" class="headroom fixed-top bg-primary">
+      
+      <a onclick="window.quartoBackToArticle(); return false;" class="btn btn-primary quarto-back-link" href=""><i class="bi bi-caret-left"></i> Back to Article</a>
+      <h6><i class="bi bi-journal-code"></i> Basics of Noise</h6>
+
+            <a href="../notebooks/review.qmd" class="btn btn-primary quarto-download-embed" download="review.qmd">Download Source</a>
+          </div>
+
+     <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Basics of Noise</h1>
+          </div>
+
+    
+    <div class="quarto-title-meta-container">
+      <div class="quarto-title-meta-column-start">
+            <div class="quarto-title-meta-author">
+          <div class="quarto-title-meta-heading">Author</div>
+          <div class="quarto-title-meta-heading">Affiliations</div>
+          
+                <div class="quarto-title-meta-contents">
+            <p class="author">Siju K S </p>
+          </div>
+                <div class="quarto-title-meta-contents">
+                    <p class="affiliation">
+                        Research Scholar
+                      </p>
+                    <p class="affiliation">
+                        Center for Computational Engineering &amp; Networking
+                      </p>
+                    <p class="affiliation">
+                        Amrita Vishwa Vidyapeetham
+                      </p>
+                  </div>
+                    </div>
+        
+        <div class="quarto-title-meta">
+
+                      
+          
+                
+              </div>
+      </div>
+      <div class="quarto-title-meta-column-end quarto-other-formats-target">
+      </div>
+    </div>
+
+
+
+    <div class="quarto-other-links-text-target">
+    </div>  </div>
+</header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#basics-of-denoising-algorithms" id="toc-basics-of-denoising-algorithms" class="nav-link active" data-scroll-target="#basics-of-denoising-algorithms">Basics of Denoising Algorithms</a>
+  <ul class="collapse">
+  <li><a href="#types-of-noise" id="toc-types-of-noise" class="nav-link" data-scroll-target="#types-of-noise">Types of Noise</a>
+  <ul class="collapse">
+  <li><a href="#additive-noise" id="toc-additive-noise" class="nav-link" data-scroll-target="#additive-noise">1. Additive Noise</a></li>
+  <li><a href="#multiplicative-noise" id="toc-multiplicative-noise" class="nav-link" data-scroll-target="#multiplicative-noise">2. Multiplicative Noise</a></li>
+  <li><a href="#salt-and-pepper-noise-impulse-noise" id="toc-salt-and-pepper-noise-impulse-noise" class="nav-link" data-scroll-target="#salt-and-pepper-noise-impulse-noise">3. Salt-and-Pepper Noise (Impulse Noise)</a></li>
+  <li><a href="#poisson-noise-shot-noise" id="toc-poisson-noise-shot-noise" class="nav-link" data-scroll-target="#poisson-noise-shot-noise">4. Poisson Noise (Shot Noise)</a></li>
+  <li><a href="#quantization-noise" id="toc-quantization-noise" class="nav-link" data-scroll-target="#quantization-noise">5. Quantization Noise</a></li>
+  </ul></li>
+  <li><a href="#connection-to-denoising-algorithms" id="toc-connection-to-denoising-algorithms" class="nav-link" data-scroll-target="#connection-to-denoising-algorithms">Connection to Denoising Algorithms</a></li>
+  <li><a href="#introduction-to-basic-denoising-algorithms" id="toc-introduction-to-basic-denoising-algorithms" class="nav-link" data-scroll-target="#introduction-to-basic-denoising-algorithms">Introduction to Basic Denoising Algorithms</a></li>
+  <li><a href="#denoising-algorithms-for-additive-noise" id="toc-denoising-algorithms-for-additive-noise" class="nav-link" data-scroll-target="#denoising-algorithms-for-additive-noise">Denoising Algorithms for Additive Noise</a>
+  <ul class="collapse">
+  <li><a href="#gaussian-smoothing-low-pass-filtering" id="toc-gaussian-smoothing-low-pass-filtering" class="nav-link" data-scroll-target="#gaussian-smoothing-low-pass-filtering">1. Gaussian Smoothing (Low-pass Filtering)</a></li>
+  <li><a href="#median-filtering" id="toc-median-filtering" class="nav-link" data-scroll-target="#median-filtering">2. Median Filtering</a></li>
+  <li><a href="#wiener-filtering" id="toc-wiener-filtering" class="nav-link" data-scroll-target="#wiener-filtering">3. Wiener Filtering</a></li>
+  </ul></li>
+  <li><a href="#sec-denoising" id="toc-sec-denoising" class="nav-link" data-scroll-target="#sec-denoising">Python Implementation for Additive Noise and Denoising</a></li>
+  <li><a href="#landing-to-the-background-of-the-article" id="toc-landing-to-the-background-of-the-article" class="nav-link" data-scroll-target="#landing-to-the-background-of-the-article">Landing to the background of the article</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">      
+
+       <section id="basics-of-denoising-algorithms" class="level1">
+<h1>Basics of Denoising Algorithms</h1>
+<p>Noise is an unwanted random variation that interferes with the underlying signal in an image or data. In the context of image processing and denoising algorithms, noise introduces distortions that degrade the visual quality of an image, making it challenging to interpret or analyse the data accurately. Noise can arise from various sources during image acquisition, transmission, or processing. Understanding the types of noise and their mathematical representations is essential for designing effective denoising algorithms.</p>
+<section id="types-of-noise" class="level2">
+<h2 class="anchored" data-anchor-id="types-of-noise">Types of Noise</h2>
+<section id="additive-noise" class="level3">
+<h3 class="anchored" data-anchor-id="additive-noise">1. Additive Noise</h3>
+<p>Additive noise refers to noise that is simply added to the original signal. This type of noise is mathematically expressed as:</p>
+<p><span class="math display">\[
+y(i, j) = x(i, j) + n(i, j)
+\]</span></p>
+<p>Where: - <span class="math inline">\(y(i, j)\)</span> is the noisy image, - <span class="math inline">\(x(i, j)\)</span> is the true, noise-free image, and - <span class="math inline">\(n(i, j)\)</span> is the noise at pixel ((i, j)).</p>
+<section id="gaussian-noise" class="level4">
+<h4 class="anchored" data-anchor-id="gaussian-noise">Gaussian Noise</h4>
+<p>Gaussian noise is the most common type of additive noise. The noise at each pixel follows a Gaussian distribution with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2\)</span>:</p>
+<p><span class="math display">\[
+n(i, j) \sim \mathcal{N}(\mu, \sigma^2)
+\]</span></p>
+<p>In most cases, Gaussian noise is assumed to have zero mean (<span class="math inline">\(\mu = 0\)</span>), making the noise purely random but distributed symmetrically around zero.</p>
+</section>
+</section>
+<section id="multiplicative-noise" class="level3">
+<h3 class="anchored" data-anchor-id="multiplicative-noise">2. Multiplicative Noise</h3>
+<p>Multiplicative noise, as the name suggests, multiplies the signal rather than adding to it. This type of noise is often encountered in systems like radar and ultrasound imaging. It can be represented mathematically as:</p>
+<p><span class="math display">\[
+y(i, j) = x(i, j) \cdot n(i, j)
+\]</span></p>
+<section id="speckle-noise" class="level4">
+<h4 class="anchored" data-anchor-id="speckle-noise">Speckle Noise</h4>
+<p>A specific example of multiplicative noise is <strong>speckle noise</strong>, which typically arises in coherent imaging systems like laser and ultrasound. It is often modelled as:</p>
+<p><span class="math display">\[
+n(i, j) \sim \mathcal{U}(1, \sigma)
+\]</span></p>
+<p>Where <span class="math inline">\(\mathcal{U}(1, \sigma)\)</span> is a uniform distribution.</p>
+</section>
+</section>
+<section id="salt-and-pepper-noise-impulse-noise" class="level3">
+<h3 class="anchored" data-anchor-id="salt-and-pepper-noise-impulse-noise">3. Salt-and-Pepper Noise (Impulse Noise)</h3>
+<p>Salt-and-pepper noise is a type of impulse noise where pixels are randomly corrupted with extreme values (either 0 or 255 in an 8-bit grayscale image). This noise is represented as:</p>
+<p><span class="math display">\[
+y(i, j) =
+\begin{cases}
+0, &amp; \text{with probability } p_1 \\
+255, &amp; \text{with probability } p_2 \\
+x(i, j), &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<p>The pixels take on either the minimum or maximum values, making this noise appear as white and black specks in an image.</p>
+</section>
+<section id="poisson-noise-shot-noise" class="level3">
+<h3 class="anchored" data-anchor-id="poisson-noise-shot-noise">4. Poisson Noise (Shot Noise)</h3>
+<p>Poisson noise arises due to the discrete nature of photon counting in imaging systems. It is signal-dependent, meaning the amount of noise depends on the intensity of the signal. This is expressed using the Poisson distribution:</p>
+<p><span class="math display">\[
+y(i, j) \sim \text{Poisson}(\lambda x(i, j))
+\]</span></p>
+<p>Here, <span class="math inline">\(\lambda\)</span> is a scaling factor, and the noise follows a Poisson distribution based on the true intensity value <span class="math inline">\(x(i, j)\)</span>.</p>
+</section>
+<section id="quantization-noise" class="level3">
+<h3 class="anchored" data-anchor-id="quantization-noise">5. Quantization Noise</h3>
+<p>Quantization noise occurs during the digitization process, where continuous signal values are rounded off to discrete levels. This is typically modelled as additive noise with a uniform distribution:</p>
+<p><span class="math display">\[
+n(i, j) \sim \mathcal{U}(-\Delta/2, \Delta/2)
+\]</span></p>
+<p>Where <span class="math inline">\(\Delta\)</span> is the step size of the quantization process.</p>
+</section>
+</section>
+<section id="connection-to-denoising-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-denoising-algorithms">Connection to Denoising Algorithms</h2>
+<p>Denoising algorithms are designed to estimate the clean signal <span class="math inline">\(x(i,j)\)</span> from the noisy observations <span class="math inline">\(y(i,j)\)</span>. The type and characteristics of the noise play a crucial role in selecting appropriate denoising methods. Some commonly used denoising methods include:</p>
+<ul>
+<li><strong>Gaussian Smoothing</strong>: Ideal for Gaussian noise removal,</li>
+<li><strong>Median Filtering</strong>: Effective against salt-and-pepper noise,</li>
+<li><strong>Non-Local Means (NLM)</strong> and <strong>BM3D</strong>: Advanced methods for a wide range of noise types.</li>
+</ul>
+</section>
+<section id="introduction-to-basic-denoising-algorithms" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-basic-denoising-algorithms">Introduction to Basic Denoising Algorithms</h2>
+<p>Denoising algorithms are essential in image processing to remove various types of noise that distort image quality. Each type of noise (Gaussian, salt-and-pepper, multiplicative, Poisson, etc.) demands different approaches. This section develops a conceptual foundation for understanding the core denoising algorithms used to tackle these noises. We explore their mathematical models, functioning, and the rationale behind each method.</p>
+</section>
+<section id="denoising-algorithms-for-additive-noise" class="level2">
+<h2 class="anchored" data-anchor-id="denoising-algorithms-for-additive-noise">Denoising Algorithms for Additive Noise</h2>
+<p>Several methods exist to remove or reduce additive noise in images. Below are the most common techniques:</p>
+<section id="gaussian-smoothing-low-pass-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="gaussian-smoothing-low-pass-filtering">1. Gaussian Smoothing (Low-pass Filtering)</h3>
+<p>Gaussian smoothing is a linear filter that reduces noise by averaging the pixels in the neighbourhood, weighted by a Gaussian function. The denoised image can be computed as:</p>
+<p><span class="math display">\[ \hat{x}(i, j) = \sum_{k,l} G(k, l) y(i-k, j-l) \]</span></p>
+<p>where <span class="math display">\[G(k, l)\]</span> is the Gaussian kernel.</p>
+</section>
+<section id="median-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="median-filtering">2. Median Filtering</h3>
+<p>Median filtering is a non-linear method where the value of each pixel is replaced by the median value of the neighbouring pixels. This is particularly effective for noise like salt-and-pepper noise, but it can also handle Gaussian noise:</p>
+<p><span class="math display">\[ \hat{x}(i, j) = \text{median} \{ y(i+k, j+l) \} \]</span></p>
+</section>
+<section id="wiener-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="wiener-filtering">3. Wiener Filtering</h3>
+<p>Wiener filtering is designed for images affected by additive Gaussian noise and uses local statistical information to perform denoising:</p>
+<p><span class="math display">\[ \hat{x}(i, j) = \frac{H^*(u,v) S_{xx}(u,v)}{|H(u,v)|^2 S_{xx}(u,v) + S_{nn}(u,v)} \]</span></p>
+<p>where: - <span class="math display">\[H(u, v)\]</span> is the degradation function, - <span class="math display">\[S_{xx}(u,v)\]</span> and <span class="math display">\[S_{nn}(u,v)\]</span> are the power spectra of the original signal and noise, respectively.</p>
+<p>The Wiener filter is derived under the assumption that the signal <span class="math inline">\(x\)</span> and noise <span class="math inline">\(n\)</span> are uncorrelated, and both are stationary stochastic processes. Given this, the Wiener filter is designed to minimize the MSE between the true signal and the estimate by accounting for the signal’s and noise’s power spectral densities (PSDs).</p>
+<p>The Wiener filter minimizes the MSE by balancing the contribution of the noisy data and the signal’s inherent structure. It effectively applies more filtering where the noise dominates (i.e., where <span class="math inline">\(S_{nn}(\omega)\)</span> is large) and less filtering where the signal is stronger (i.e., where <span class="math inline">\(S_{xx}(\omega)\)</span> is large).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Intuition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In simple terms, the Wiener filter achieves the optimal balance between noise suppression and signal preservation by minimizing the MSE. It effectively chooses a trade-off between removing as much noise as possible while still preserving the signal’s details. This is why the Wiener filter can be said to minimize the cost function,</p>
+<p><span class="math display">\[\Phi_\lambda(y)=\mathbb{E}\left(||y-x||^2\right)\]</span></p>
+<p>By solving this minimization problem using calculus of variations, we arrive at the Wiener filter formula,</p>
+<p><span class="math display">\[H(\omega)=\frac{S_{xx}(\omega)}{S_{xx}(\omega)+S_{nn}(\omega)}\]</span></p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-denoising" class="level2">
+<h2 class="anchored" data-anchor-id="sec-denoising">Python Implementation for Additive Noise and Denoising</h2>
+<p>Below is a <code>Python</code> code example using <code>OpenCV</code> and <code>Scipy</code> to apply denoising algorithms on the famous ‘Lena’ image.</p>
+<div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div id="75842686" class="cell" data-execution_count="1">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+from PIL import Image
+import urllib.request
+urllib.request.urlretrieve('http://lenna.org/len_top.jpg',"input.jpg")
+img1 = Image.open("input.jpg") #loading first image
+arr1 = np.array(img1)</code></pre>
+</div></div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="cfb443a4" class="cell" data-execution_count="2">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Adding Gaussian noise with a lower sigma (e.g., sigma=10 for less noise)
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Display noisy image
+plt.figure(figsize=(8, 5))
+plt.imshow(noisy_lena, cmap='gray')
+plt.title('Noisy Lena Image (Gaussian Noise, sigma=10)')
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="review_files/figure-html/cell-3-output-1.png" width="649" height="396" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="0a1c3769" class="cell markdown">
+<ol type="1">
+<li>Gaussian Smoothing in Python Gaussian smoothing can be applied using the following code:</li>
+</ol>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [3]:</pre></div><div id="a2c194c1" class="cell" data-execution_count="3">
+<pre><code>#| code-overflow: wrap
+# Apply Gaussian smoothing
+smoothed_lena = cv2.GaussianBlur(noisy_lena, (5, 5), sigmaX=1)
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.title("Denoised Image (Gaussian Smoothing)")
+plt.imshow(smoothed_lena, cmap='gray')
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="review_files/figure-html/cell-4-output-1.png" width="649" height="396" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="08795a42" class="cell markdown">
+<ol start="2" type="1">
+<li>Median Filtering in Python</li>
+</ol>
+<p>To apply median filtering:</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [4]:</pre></div><div id="4b861325" class="cell" data-execution_count="4">
+<pre><code>#| code-overflow: wrap
+# Apply Median filtering
+median_lena = cv2.medianBlur(noisy_lena, 5)
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.title("Denoised Image (Median Filtering)")
+plt.imshow(median_lena, cmap='gray')
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="review_files/figure-html/cell-5-output-1.png" width="649" height="396" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="32f44e94" class="cell markdown">
+<ol start="3" type="1">
+<li>Non-Local means denoising</li>
+</ol>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [5]:</pre></div><div id="e2df25af" class="cell" data-execution_count="5">
+<pre><code>#| code-overflow: wrap
+# Apply Non-Local Means denoising (cv2.fastNlMeansDenoising for grayscale)
+nlmeans_denoised_lena = cv2.fastNlMeansDenoising(noisy_lena, h=10, templateWindowSize=7, searchWindowSize=21)
+
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(nlmeans_denoised_lena, cmap='gray')
+plt.title('Non-Local Means Denoising')
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="review_files/figure-html/cell-6-output-1.png" width="649" height="396" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="3b89d22d" class="cell markdown">
+<ol start="4" type="1">
+<li>Bilateral filtering</li>
+</ol>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [6]:</pre></div><div id="703040f5" class="cell" data-execution_count="6">
+<pre><code>#| code-overflow: wrap
+# Apply Bilateral Filter
+bilateral_denoised = cv2.bilateralFilter(noisy_lena, d=9, sigmaColor=75, sigmaSpace=75)
+
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(bilateral_denoised, cmap='gray')
+plt.title('Bilateral Filtering')
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="review_files/figure-html/cell-7-output-1.png" width="649" height="396" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="b0690716" class="cell markdown">
+<ol start="3" type="1">
+<li>Weinner denoiser</li>
+</ol>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [7]:</pre></div><div id="91bf47c9" class="cell" data-execution_count="7">
+<pre><code>#| code-overflow: wrap
+from scipy.signal import wiener
+
+# Apply Wiener Filtering
+denoised_image = wiener(noisy_lena)
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(denoised_image, cmap='gray')
+plt.title('Weinner denoiser')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="review_files/figure-html/cell-8-output-1.png" width="758" height="458" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="4c287ac5" class="cell markdown">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reason for worst denoising effect
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this case, adding Gaussian noise makes the noise stationary, but if the underlying image is non-stationary (as most images are), the Wiener filter may struggle to achieve optimal results. It treats all areas of the image uniformly, without taking into account the local variations (edges, textures), which leads to suboptimal denoising.</p>
+</div>
+</div>
+<p>To improve the performance of denoising in such cases, advanced techniques (e.g., BM3D, non-local means) that adapt to local variations in the image are generally more effective.</p>
+<p>From these illustrations, let’s go for the simplest case but reasonably fit to our learning needs- the Gaussian smoothing. As an experiment to optimize the image denoising with optimal paramters, an iterative approach is used as shown below. Here the adopted procedure is:</p>
+<p><em>Define a Metric for Error:</em> Calculate the error between the denoised image and the original image. Common metrics include Mean Squared Error (MSE) and Peak Signal-to-Noise Ratio (PSNR).</p>
+<p><em>Vary Parameters:</em> Experiment with different values for the kernel size and sigmaX to see which combination provides the best performance.</p>
+<p><em>Evaluate and Choose the Best Parameters:</em> Use the defined error metric to compare different parameter settings and select the ones with the lowest error.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [8]:</pre></div><div id="bb5f3216" class="cell" data-execution_count="8">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute MSE
+def compute_mse(original, denoised):
+    return mean_squared_error(original.flatten(), denoised.flatten())
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create noisy image
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_mse = float('inf')
+best_params = (None, None)
+best_denoised_image = None
+
+# Prepare subplots
+fig, axes = plt.subplots(len(kernel_sizes), len(sigmaXs), figsize=(8, 5))
+fig.suptitle('Denoised Images for Different Parameters', fontsize=16)
+
+for i, ksize in enumerate(kernel_sizes):
+    for j, sigmaX in enumerate(sigmaXs):
+        # Apply Gaussian smoothing
+        smoothed_lena = apply_gaussian_smoothing(noisy_lena, ksize, sigmaX)
+        
+        # Compute MSE
+        mse = compute_mse(lena, smoothed_lena)
+        
+        # Update best parameters if this is the best MSE
+        if mse &lt; best_mse:
+            best_mse = mse
+            best_params = (ksize, sigmaX)
+            best_denoised_image = smoothed_lena
+        
+        # Display the image in subplot
+        ax = axes[i, j]
+        ax.imshow(smoothed_lena, cmap='gray')
+        ax.set_title(f'K={ksize}, S={sigmaX}')
+        ax.axis('off')
+
+# Display the best denoised image
+plt.figure()
+plt.title("Best Denoised Image (Gaussian Smoothing)")
+plt.imshow(best_denoised_image, cmap='gray')
+plt.tight_layout()
+plt.show()
+print(f"Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}")
+print(f"Best MSE: {best_mse}")</code></pre>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="review_files/figure-html/cell-9-output-1.png" width="614" height="433" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-9-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="review_files/figure-html/cell-9-output-2.png" width="662" height="404" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best parameters: Kernel Size = 5, SigmaX = 1
+Best MSE: 30.841855555555554</code></pre>
+</div>
+</div></div>
+<div id="4585d4dd" class="cell markdown">
+<p>Mean Square Error is a common but imperfect measure of image quality. MSE focuses on pixel-wise differences, which may not correlate well with perceptual image quality. An image can have low MSE but still appear blurry or lack important details. Newer algorithms often aim to balance MSE minimization with other perceptually relevant metrics, leading to better subjective image quality even if the MSE is slightly higher.</p>
+<p>Peak signal-to-noise ratio (PSNR) is an engineering term for the ratio between the maximum possible power of a signal and the power of corrupting noise that affects the fidelity of its representation. It is a common metric used to assess the quality of the denoised image defined as:</p>
+<p><span class="math display">\[ \text{PSNR}=10\log_{10}\left(\frac{\text{Max}_i^2}{\text{MSE}}\right)\]</span></p>
+<p>where <span class="math inline">\(\text{MAX}_i\)</span> is the maximum possible pixel value of the image, and MSE is the mean squared error between the ground truth and the denoised image. A <code>Python</code> implementation that replaces MSE with PSNR is shown below.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [9]:</pre></div><div id="71b35753" class="cell" data-execution_count="9">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = mean_squared_error(original.flatten(), denoised.flatten())
+    if mse == 0:
+        return 100  # Perfect match
+    max_pixel = 255.0
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create noisy image
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_psnr = -float('inf')
+best_params = (None, None)
+best_denoised_image = None
+
+# Prepare subplots
+fig, axes = plt.subplots(len(kernel_sizes), len(sigmaXs), figsize=(8, 5))
+fig.suptitle('Denoised Images for Different Parameters', fontsize=16)
+
+for i, ksize in enumerate(kernel_sizes):
+    for j, sigmaX in enumerate(sigmaXs):
+        # Apply Gaussian smoothing
+        smoothed_lena = apply_gaussian_smoothing(noisy_lena, ksize, sigmaX)
+        
+        # Compute PSNR
+        psnr = compute_psnr(lena, smoothed_lena)
+        
+        # Update best parameters if this is the best PSNR
+        if psnr &gt; best_psnr:
+            best_psnr = psnr
+            best_params = (ksize, sigmaX)
+            best_denoised_image = smoothed_lena
+        
+        # Display the image in subplot
+        ax = axes[i, j]
+        ax.imshow(smoothed_lena, cmap='gray')
+        ax.set_title(f'K={ksize}, S={sigmaX}')
+        ax.axis('off')
+
+# Display the best denoised image
+plt.figure()
+plt.title("Best Denoised Image (Gaussian Smoothing)")
+plt.imshow(best_denoised_image, cmap='gray')
+plt.tight_layout()
+plt.show()
+
+print(f"Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}")
+print(f"Best PSNR: {best_psnr} dB")</code></pre>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="review_files/figure-html/cell-10-output-1.png" width="614" height="433" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-10-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="review_files/figure-html/cell-10-output-2.png" width="662" height="404" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best parameters: Kernel Size = 3, SigmaX = 1
+Best PSNR: 33.24004484491318 dB</code></pre>
+</div>
+</div></div>
+<div id="4398573e" class="cell markdown">
+<p>In this experiment, both the approaches produced the same result!</p>
+<p>Next we consider a more general situation. Suppose 20 noisy images of the same clean image are avaiable. Need to denoise all the images at the best level. There are two approaches for this situation.</p>
+<ol type="1">
+<li><p>Apply denoising algorithm with varying parameters on all 20 noisy images, and identify the best parameters using MSE or PSNR metric. Finally use these best parameters on all noised images to denoise to the optimum.</p></li>
+<li><p>Use a same approach in the first part. But instead of using the best parameters, use the parameters of the <em>most likely</em> MSE or PSNR measure for final denoising.</p></li>
+</ol>
+<p>Python implementation of the second approach is given below.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [10]:</pre></div><div id="687f3dfd" class="cell" data-execution_count="10">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = mean_squared_error(original.flatten(), denoised.flatten())
+    if mse == 0:
+        return 100  # Perfect match
+    max_pixel = 255.0
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create 20 noisy images
+num_noisy_images = 20
+noisy_images = [add_gaussian_noise(lena, sigma=10) for _ in range(num_noisy_images)]
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_psnr = -float('inf')
+best_params = (None, None)
+
+# Evaluate parameters on the dataset
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        psnr_total = 0
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = apply_gaussian_smoothing(noisy_img, ksize, sigmaX)
+            
+            # Compute PSNR
+            psnr = compute_psnr(lena, smoothed_img)
+            psnr_total += psnr
+        
+        # Average PSNR for this parameter set
+        avg_psnr = psnr_total / num_noisy_images
+        
+        # Update best parameters if this is the best PSNR
+        if avg_psnr &gt; best_psnr:
+            best_psnr = avg_psnr
+            best_params = (ksize, sigmaX)
+
+print(f"Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}")
+print(f"Best Average PSNR: {best_psnr} dB")
+
+# Prepare subplots
+rows = 4
+cols = 5
+fig, axes = plt.subplots(rows, cols, figsize=(8, 5))
+
+# Flatten axes array for easy indexing
+axes = axes.flatten()
+
+# Apply optimal parameters to noisy images and display
+for i, noisy_img in enumerate(noisy_images):
+    # Apply Gaussian smoothing with optimal parameters
+    denoised_img = apply_gaussian_smoothing(noisy_img, best_params[0], best_params[1])
+    
+    # Display the denoised image in subplot
+    ax = axes[i]
+    ax.imshow(denoised_img, cmap='gray')
+    ax.set_title(f"Image {i+1}")
+    ax.axis('off')
+
+# Hide any unused subplots
+for j in range(num_noisy_images, rows * cols):
+    axes[j].axis('off')
+
+# Adjust layout and display the plot
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best parameters: Kernel Size = 5, SigmaX = 1
+Best Average PSNR: 33.21379870244354 dB</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-11-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="review_files/figure-html/cell-11-output-2.png" width="758" height="442" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+</section>
+<div id="7e741e70" class="cell markdown">
+<section id="landing-to-the-background-of-the-article" class="level2">
+<h2 class="anchored" data-anchor-id="landing-to-the-background-of-the-article">Landing to the background of the article</h2>
+<p>Is it possible to create a high-quality denoised image from a set of noisy images, even if we don’t have the clean reference image?</p>
+<p>Sure. This classical technique is commonly referred to as image denoising through <em>ensemble methods</em> or <em>image fusion</em>. The idea is to leverage the fact that each noisy image contains some useful information, and by combining these images effectively, one can obtain a better denoised result. This seems to be more realistic in application view point.</p>
+</section>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [11]:</pre></div><div id="6b6d0176" class="cell" data-execution_count="11">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute Mean Squared Error (MSE) between two images
+def compute_mse(image1, image2):
+    return mean_squared_error(image1.flatten(), image2.flatten())
+
+# Load the clean image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Number of noisy images to generate
+num_noisy_images = 20
+sigma = 10  # Standard deviation for Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(lena, sigma) for _ in range(num_noisy_images)]
+
+# Define parameter ranges for denoising
+kernel_sizes = [3, 5, 7, 9]
+sigmaXs = [0.5, 1, 1.5, 2]
+
+# Variables to keep track of best parameters
+best_mse = float('inf')
+best_params = (None, None)
+best_denoised_images = []
+
+# Perform denoising for different parameters
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        denoised_images = []
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = cv2.GaussianBlur(noisy_img, (ksize, ksize), sigmaX=sigmaX)
+            denoised_images.append(smoothed_img)
+        
+        # Convert list to numpy array for easy manipulation
+        denoised_images = np.array(denoised_images)
+
+        # Compute the average of all denoised images
+        average_denoised_image = np.mean(denoised_images, axis=0)
+        average_denoised_image = np.clip(average_denoised_image, 0, 255).astype(np.uint8)
+
+        # Compute the mean squared error (MSE) between all pairs of denoised images
+        mse_total = 0
+        count = 0
+        for i in range(len(denoised_images)):
+            for j in range(i + 1, len(denoised_images)):
+                mse_total += compute_mse(denoised_images[i], denoised_images[j])
+                count += 1
+        
+        # Average MSE
+        mse_avg = mse_total / count if count &gt; 0 else float('inf')
+
+        # Update best parameters if this is the best MSE
+        if mse_avg &lt; best_mse:
+            best_mse = mse_avg
+            best_params = (ksize, sigmaX)
+            best_denoised_images = denoised_images
+
+# Compute the average image from the best denoised images
+average_best_denoised_image = np.mean(best_denoised_images, axis=0)
+average_best_denoised_image = np.clip(average_best_denoised_image, 0, 255).astype(np.uint8)
+
+# Display the averaged denoised images
+fig, axes = plt.subplots(4, 5, figsize=(8, 5))
+for i in range(4):
+    for j in range(5):
+        idx = i * 5 + j
+        if idx &lt; len(noisy_images):
+            axes[i, j].imshow(noisy_images[idx], cmap='gray')
+            axes[i, j].set_title(f'Noisy Image {idx+1}')
+            axes[i, j].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(average_best_denoised_image, cmap='gray')
+plt.title(f"Best Averaged Denoised Image\nBest Parameters: K={best_params[0]}, S={best_params[1]}")
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+
+# Print best parameters and MSE
+print(f"Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}")
+print(f"Best Average MSE: {best_mse}")</code></pre>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="review_files/figure-html/cell-12-output-1.png" width="758" height="457" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-12-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="review_files/figure-html/cell-12-output-2.png" width="758" height="473" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best parameters: Kernel Size = 9, SigmaX = 2
+Best Average MSE: 4.6294501754386</code></pre>
+</div>
+</div></div>
+<div id="b65426a7" class="cell markdown">
+<p>Instead of MSE, the PSNR metric can be used. Here the comparison is with another <em>noisy image</em>.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [12]:</pre></div><div id="d7436efe" class="cell" data-execution_count="12">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Function to calculate PSNR
+def calculate_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')  # PSNR is infinite for identical images
+    max_pixel = 255.0
+    psnr = 10 * np.log10((max_pixel ** 2) / mse)
+    return psnr
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Load the clean image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Number of noisy images to generate
+num_noisy_images = 20
+sigma = 10  # Standard deviation for Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(lena, sigma) for _ in range(num_noisy_images)]
+
+# Define parameter ranges for denoising
+kernel_sizes = [3, 5, 7, 9]
+sigmaXs = [0.5, 1, 1.5, 2]
+
+# Variables to keep track of best parameters
+best_psnr = float('-inf')
+best_params = (None, None)
+best_denoised_images = []
+
+# Perform denoising for different parameters
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        denoised_images = []
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = cv2.GaussianBlur(noisy_img, (ksize, ksize), sigmaX=sigmaX)
+            denoised_images.append(smoothed_img)
+        
+        # Convert list to numpy array for easy manipulation
+        denoised_images = np.array(denoised_images)
+
+        # Compute the average of all denoised images
+        average_denoised_image = np.mean(denoised_images, axis=0)
+        average_denoised_image = np.clip(average_denoised_image, 0, 255).astype(np.uint8)
+
+        # Compute the average PSNR between all pairs of denoised images
+        psnr_total = 0
+        count = 0
+        for i in range(len(denoised_images)):
+            for j in range(i + 1, len(denoised_images)):
+                psnr_total += calculate_psnr(denoised_images[i], denoised_images[j])
+                count += 1
+        
+        # Average PSNR
+        psnr_avg = psnr_total / count if count &gt; 0 else float('-inf')
+
+        # Update best parameters if this is the best PSNR
+        if psnr_avg &gt; best_psnr:
+            best_psnr = psnr_avg
+            best_params = (ksize, sigmaX)
+            best_denoised_images = denoised_images
+
+# Compute the average image from the best denoised images
+average_best_denoised_image = np.mean(best_denoised_images, axis=0)
+average_best_denoised_image = np.clip(average_best_denoised_image, 0, 255).astype(np.uint8)
+
+# Display the averaged denoised images
+fig, axes = plt.subplots(4, 5, figsize=(8, 5))
+for i in range(4):
+    for j in range(5):
+        idx = i * 5 + j
+        if idx &lt; len(noisy_images):
+            axes[i, j].imshow(noisy_images[idx], cmap='gray')
+            axes[i, j].set_title(f'Noisy Image {idx+1}')
+            axes[i, j].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(average_best_denoised_image, cmap='gray')
+plt.title(f"Best Averaged Denoised Image\nBest Parameters: K={best_params[0]}, S={best_params[1]}")
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+
+# Print best parameters and PSNR
+print(f"Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}")
+print(f"Best Average PSNR: {best_psnr}")</code></pre>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="review_files/figure-html/cell-13-output-1.png" width="758" height="457" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="review_files/figure-html/cell-13-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="review_files/figure-html/cell-13-output-2.png" width="758" height="473" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best parameters: Kernel Size = 9, SigmaX = 2
+Best Average PSNR: 41.510077911111544</code></pre>
+</div>
+</div></div>
+<div id="0e939872" class="cell markdown">
+<p>In this article, authors refer that, in the context of image denoising with Gaussian noise, <em>Generalized Cross Validation (GCV)</em> and **Stein’s Unbiased Risk Estimate (SURE)* are used to estimate the performance of denoising algorithms without requiring a clean reference image. A review of these topics from fundamentals of image processing provides following key insights.</p>
+<section id="generalized-cross-validation-gcv" class="level3">
+<h3 class="anchored" data-anchor-id="generalized-cross-validation-gcv">Generalized Cross Validation (GCV)</h3>
+<p>Generalized Cross Validation is a technique used to estimate the optimal parameters of a model by minimizing an estimate of the prediction error. In image denoising, GCV helps in selecting the best parameters for a denoising algorithm without needing a clean reference image.</p>
+<p>Steps in using GCV are:</p>
+<ol type="1">
+<li><em>Model and Data</em>: Apply a denoising algorithm with different parameter settings to the noisy image.</li>
+<li><em>Estimate Residuals</em>: For each parameter setting, compute an estimate of the residual error. This involves calculating how well the model predicts the noisy image based on the parameters.</li>
+<li><em>Optimize Parameters</em>: Choose the parameters that minimize the generalized cross-validation criterion, which is an estimate of the prediction error.</li>
+</ol>
+<p><strong>Mathematical Formulation:</strong></p>
+<p>For Gaussian noise, GCV often involves minimizing the following criterion:</p>
+<p><span class="math display">\[
+\text{GCV}(\lambda) = \frac{1}{n} \sum_{i=1}^n \frac{(y_i - \hat{y}_i)^2}{(1 - h_i)^2}
+\]</span></p>
+<p>where: - <span class="math inline">\(y_i\)</span> is the observed noisy value. - <span class="math inline">\(\hat{y}_i\)</span> is the estimated value from the denoising model. - <span class="math inline">\(h_i\)</span> is the leverage or influence of the <span class="math inline">\(i\)</span>-th observation.</p>
+</section>
+<section id="steins-unbiased-risk-estimate-sure" class="level3">
+<h3 class="anchored" data-anchor-id="steins-unbiased-risk-estimate-sure">Stein’s Unbiased Risk Estimate (SURE)</h3>
+<p>Stein’s Unbiased Risk Estimate provides an estimate of the mean squared error (MSE) of an estimator without needing the true clean image. It is particularly useful for choosing regularization parameters in denoising problems.</p>
+<p>Key steps:</p>
+<ol type="1">
+<li><em>Estimate the Risk</em>: Compute Stein’s unbiased risk estimate based on the noisy image and the denoised estimate.</li>
+<li><em>Optimize Parameters</em>: Select the parameters that minimize the SURE estimate.</li>
+</ol>
+<p><strong>Mathematical Formulation:</strong></p>
+<p>SURE for Gaussian noise can be expressed as:</p>
+<p><span class="math display">\[
+\text{SURE}(\hat{f}) = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{f}(x_i))^2 + 2 \sigma^2 \text{trace}(I - H)
+\]</span></p>
+<p>where: - <span class="math inline">\(y_i\)</span> is the noisy observation. - <span class="math inline">\(\hat{f}(x_i)\)</span> is the estimate from the denoising algorithm. - <span class="math inline">\(\sigma^2\)</span> is the noise variance. - <span class="math inline">\(H\)</span> is the hat matrix or influence matrix.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><em>Generalized Cross Validation (GCV)</em> and <em>Stein’s Unbiased Risk Estimate (SURE)</em> are statistical methods used for parameter selection in denoising algorithms without needing a clean reference image.</p></li>
+<li><p><em>GCV</em> involves minimizing an estimate of the prediction error.</p></li>
+<li><p><em>SURE</em> provides an unbiased estimate of the mean squared error for a given denoised image.</p></li>
+</ul>
+<p>Both methods help in optimizing denoising parameters effectively in the absence of a clean image by leveraging statistical properties of Gaussian noise.</p>
+</div>
+</div>
+<p>As in the previous examples, it is clear that the MSE is not a good measure for assessing quality of a denoised image and PSNR is more on perception side. So, experimenting the GCV and SURE is a good option.</p>
+<p>Python implementation of <em>GCV</em> is given below.</p>
+</section>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [13]:</pre></div><div id="11061b7c" class="cell" data-execution_count="13">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute Generalized Cross Validation (GCV)
+def generalized_cross_validation(noisy_images, denoised_images, parameters):
+    best_gcv = float('inf')
+    best_denoised_image = None
+    best_params = None
+
+    for i, denoised_image in enumerate(denoised_images):
+        residuals = [noisy - denoised_image for noisy in noisy_images]
+        
+        # Calculate a simplified leverage matrix
+        h = np.ones_like(noisy_images[0]) * 0.01  # Small constant to prevent division by zero
+        
+        # Compute GCV criterion for each noisy image
+        gcv_values = []
+        for residual in residuals:
+            gcv = np.mean((residual ** 2) / (1 - h) ** 2)
+            gcv_values.append(gcv)
+        
+        average_gcv = np.mean(gcv_values)
+        
+        if average_gcv &lt; best_gcv:
+            best_gcv = average_gcv
+            best_denoised_image = denoised_image
+            best_params = parameters[i]
+    
+    return best_denoised_image, best_params
+
+# Parameters
+sigma_values = [10]  # Gaussian noise standard deviation
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Generate multiple noisy images
+num_noisy_images = 10  # Ensure a sufficient number of noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma=sigma_values[0]) for _ in range(num_noisy_images)]
+
+# Apply Gaussian smoothing with different parameters
+denoised_images = []
+parameters = []
+for noisy_image in noisy_images:
+    for ksize in kernel_sizes:
+        for sigmaX in sigmaXs:
+            denoised_image = apply_gaussian_smoothing(noisy_image, ksize, sigmaX)
+            denoised_images.append(denoised_image)
+            parameters.append((ksize, sigmaX))
+
+# Check if there are enough noisy images to split
+if len(noisy_images) &gt; 1:
+    # Split the noisy images into training and validation sets
+    train_noisy, val_noisy = train_test_split(noisy_images, test_size=0.5, random_state=42)
+
+    # Apply GCV to find the best denoised image
+    best_denoised_image, best_params = generalized_cross_validation(train_noisy, denoised_images, parameters)
+else:
+    print("Not enough noisy images to perform training and validation split.")
+    best_denoised_image = denoised_images[0]  # Default to the first denoised image if not enough data
+    best_params = parameters[0]  # Default to the first parameters if not enough data
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f"Best Denoised Image (GCV)\nK={best_params[0]}, S={best_params[1]}")
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="review_files/figure-html/cell-14-output-1.png" width="758" height="473" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="d981405d" class="cell markdown">
+<p>Python implementation of SURE approach is shown below.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [14]:</pre></div><div id="457a6d20" class="cell" data-execution_count="14">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute Stein’s Unbiased Risk Estimate (SURE)
+def steins_unbiased_risk_estimate(noisy_image, denoised_image, sigma):
+    # Compute residuals
+    residuals = noisy_image - denoised_image
+    
+    # Estimate the risk
+    n = noisy_image.size
+    sure = np.mean(residuals ** 2) + 2 * sigma ** 2 * np.mean(np.abs(residuals))
+    
+    return sure
+
+# Parameters
+sigma_values = [10]  # Gaussian noise standard deviation
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Apply Gaussian smoothing with different parameters
+denoised_images = []
+for noisy_image in noisy_images:
+    for ksize in kernel_sizes:
+        for sigmaX in sigmaXs:
+            denoised_image = apply_gaussian_smoothing(noisy_image, ksize, sigmaX)
+            denoised_images.append((denoised_image, ksize, sigmaX))
+
+# Find the best denoised image using SURE
+best_sure = float('inf')
+best_denoised_image = None
+best_params = (None, None)
+
+for denoised_image, ksize, sigmaX in denoised_images:
+    sure = steins_unbiased_risk_estimate(noisy_image, denoised_image, sigma=10)
+    
+    if sure &lt; best_sure:
+        best_sure = sure
+        best_denoised_image = denoised_image
+        best_params = (ksize, sigmaX)
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f"Best Denoised Image (SURE)\nK={best_params[0]}, S={best_params[1]}")
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="review_files/figure-html/cell-15-output-1.png" width="758" height="473" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="c8d0e32c" class="cell markdown">
+<p>In this experiment, both the approach come with same parameters!</p>
+<p>Cross-validation is used to assess how well a model (or in this case, a denoising algorithm with specific parameters <span class="math inline">\(k\)</span> and <code>sigmaX</code>) generalizes to unseen data. For image denoising, it involves splitting the data into training and validation sets to evaluate the performance of different parameter settings.</p>
+<p>In the context of denoising, we would use noisy images with known parameters to select the best parameters by evaluating how well the denoising algorithm performs on validation images. This process helps in selecting parameters that <em>generalize</em> well across different noisy samples.</p>
+<p>Also <em>SURE</em> provides an estimate of the risk (or error) of a denoising algorithm based on the residuals between noisy and denoised images. It helps in selecting parameters that minimize this estimated risk.</p>
+<p>Now come into the authors’ concept-<em>… the proposed method i.e., fitting algorithm parameters to a single image, corresponds to the extreme case of one pair of noisy images of a single clean image</em>. So, training on variable images is not possible. Here the parameter fine tuning in restricted to just a pair of noisy images of a single clean image which in turn not available for reference!</p>
+<section id="replicating-the-authors-work-with-gradient-descend" class="level2">
+<h2 class="anchored" data-anchor-id="replicating-the-authors-work-with-gradient-descend">Replicating the author’s work with gradient descend</h2>
+<p>In the proposed model for <code>N2N</code> denoiser, authors formulate the objective function as: <span class="math display">\[\mathcal{C}(\theta)=||A_\theta(y)-y'||\]</span></p>
+<p>Where <span class="math inline">\(A_\theta\)</span> is the denoiser algorithm in N2N model , <span class="math inline">\(y\)</span> and <span class="math inline">\(y'\)</span> are two noisy images. They minimize this objective function using gradient descent with automatic differentiation and initial value of the parameters <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\theta_0\)</span> found by manually tuning the parameters for a single image.</p>
+<p>To optimize the cost function without using neural networks, we can directly minimize the loss function using optimization techniques (<code>minimize</code> function from <code>scipy</code> library). A python implementation of this parameter tuning is given below.</p>
+</section>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [15]:</pre></div><div id="ea4e4f04" class="cell" data-execution_count="15">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Create noisy images
+sigma = 10
+noisy_image1 = add_gaussian_noise(clean_image, sigma)
+noisy_image2 = add_gaussian_noise(clean_image, sigma)
+## Define the Denoising Function- The quadratic error function
+def apply_gaussian_filter(image, kernel_size, sigma):
+    return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigmaX=sigma)
+
+def cost_function(params, noisy_image1, noisy_image2):
+    kernel_size, sigma = int(params[0]), params[1]
+    denoised_image = apply_gaussian_filter(noisy_image1, kernel_size, sigma)
+    residuals = denoised_image - noisy_image2
+    return np.sum(residuals ** 2)
+## Optimize the Parameters using gradient descend
+# Initial guess for parameters (kernel_size, sigma)
+initial_params = [3, 1.0]
+
+# Perform optimization
+result = minimize(cost_function, initial_params, args=(noisy_image1, noisy_image2),
+                  bounds=[(3, 21), (0.1, 5.0)],  # bounds for kernel size and sigma
+                  method='L-BFGS-B')
+
+# Extract optimized parameters
+optimized_kernel_size, optimized_sigma = result.x
+print(f"Optimized kernel size: {int(optimized_kernel_size)}")
+print(f"Optimized sigma: {optimized_sigma}")
+
+# Apply the optimized denoising function
+optimized_denoised_image = apply_gaussian_filter(noisy_image1, int(optimized_kernel_size), optimized_sigma)
+
+##  Display the Results
+# Display the optimized denoised image
+plt.figure(figsize=(8, 5))
+plt.figure()
+plt.imshow(optimized_denoised_image, cmap='gray')
+plt.title(f'Optimized Denoised Image\nKernel Size: {int(optimized_kernel_size)}, Sigma: {optimized_sigma:.2f}')
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimized kernel size: 3
+Optimized sigma: 1.0</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 768x480 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-16-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="review_files/figure-html/cell-16-output-3.png" width="662" height="419" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="e153e51b" class="cell markdown">
+<p>A from the scratch mathematical implementation of gradient and the gradient descent algorithm is shown below.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [16]:</pre></div><div id="e21c9db4" class="cell" data-execution_count="16">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to ensure kernel size is odd and positive
+def valid_kernel_size(kernel_size):
+    if kernel_size &lt; 1:
+        kernel_size = 1
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+    return int(kernel_size)
+
+# Function to apply Gaussian smoothing
+def denoiser(theta, noisy_image):
+    kernel_size = valid_kernel_size(int(theta[0]))  # Ensure the kernel size is an odd integer
+    sigmaX = theta[1]
+    return cv2.GaussianBlur(noisy_image, (kernel_size, kernel_size), sigmaX=sigmaX)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')
+    psnr = 20 * np.log10(255.0 / np.sqrt(mse))
+    return psnr
+
+# Cost function for scipy optimization
+def cost_function(theta, noisy_image1, noisy_image2):
+    denoised_image = denoiser(theta, noisy_image1)
+    return np.mean((denoised_image - noisy_image2) ** 2)
+
+# Manual gradient descent for denoising optimization
+def gradient_descent(noisy_image, noisy_image2, theta, alpha=0.01, iterations=100):
+    for i in range(iterations):
+        # Compute the gradient for each parameter
+        kernel_size, sigmaX = theta
+        kernel_size = valid_kernel_size(kernel_size)
+        
+        # Denoise the image
+        denoised_image = cv2.GaussianBlur(noisy_image, (int(kernel_size), int(kernel_size)), sigmaX)
+
+        # Compute the gradient for both kernel_size and sigmaX
+        grad_kernel = np.sum(2 * (denoised_image - noisy_image2))  # Simplified gradient computation
+        grad_sigma = np.sum(2 * (denoised_image - noisy_image2))   # Simplified gradient computation
+
+        # Update theta using the gradients
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+
+    return theta
+
+# Noisy images
+noisy_image1 = add_gaussian_noise(clean_image, sigma=20)
+noisy_image2 = add_gaussian_noise(clean_image, sigma=20)
+
+# Initial parameters (theta): [kernel_size, sigmaX]
+initial_theta = [5, 1.0]
+
+# Scipy optimizer: Minimize the cost function
+result = minimize(cost_function, initial_theta, args=(noisy_image1, noisy_image2), method='BFGS', options={'disp': True})
+optimized_theta_scipy = result.x
+denoised_image_scipy = denoiser(optimized_theta_scipy, noisy_image1)
+psnr_scipy = compute_psnr(clean_image, denoised_image_scipy)
+
+# Manual gradient descent optimizer
+optimized_theta_sgd = gradient_descent(noisy_image1, noisy_image2, initial_theta.copy())
+denoised_image_sgd = denoiser(optimized_theta_sgd, noisy_image1)
+psnr_sgd = compute_psnr(clean_image, denoised_image_sgd)
+psnr_noisy=compute_psnr(clean_image, noisy_image1)
+# Plot the results
+fig, ax = plt.subplots(1, 4, figsize=(10, 5))
+# Plot 0: Noisy image y
+ax[0].imshow(noisy_image1, cmap='gray')
+ax[0].set_title(f'Noisy image-1, PSNR: {psnr_noisy:.2f} dB')
+ax[0].axis('off')
+
+# Plot 1: Denoised image (scipy optimizer)
+ax[1].imshow(denoised_image_scipy, cmap='gray')
+ax[1].set_title(f'Scipy Optimizer, PSNR: {psnr_scipy:.2f} dB')
+ax[1].axis('off')
+
+# Plot 2: Denoised image (Manual Gradient Descent)
+ax[2].imshow(denoised_image_sgd, cmap='gray')
+ax[2].set_title(f'Manual Gradient Descent, PSNR: {psnr_sgd:.2f} dB')
+ax[2].axis('off')
+
+# Plot 3: Clean image
+ax[3].imshow(clean_image, cmap='gray')
+ax[3].set_title('Clean Image')
+ax[3].axis('off')
+plt.tight_layout()
+# Show the plot
+plt.show()</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimization terminated successfully.
+         Current function value: 90.614056
+         Iterations: 0
+         Function evaluations: 3
+         Gradient evaluations: 1</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-17-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="review_files/figure-html/cell-17-output-2.png" width="964" height="164" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="6fea1177" class="cell markdown">
+<p>An alternative approach is to use the Gradient descent algorithm form <code>sklearn</code> library.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [17]:</pre></div><div id="af42aed3" class="cell" data-execution_count="17">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Create noisy images
+sigma = 10
+noisy_image_1 = add_gaussian_noise(clean_image, sigma)
+noisy_image_2 = add_gaussian_noise(clean_image, sigma)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(image, ksize, sigmaX):
+    return cv2.GaussianBlur(image, (ksize, ksize), sigmaX=sigmaX)
+
+# Define a custom loss function (Mean Squared Error between two denoised images)
+def loss_function(ksize, sigmaX, noisy_image_1, noisy_image_2):
+    denoised_image_1 = apply_gaussian_smoothing(noisy_image_1, ksize, sigmaX)
+    denoised_image_2 = apply_gaussian_smoothing(noisy_image_2, ksize, sigmaX)
+    return np.mean((denoised_image_1 - denoised_image_2) ** 2)
+
+# Parameters for optimization
+ksize_range = np.array([3, 5, 7, 9])  # Possible kernel sizes
+sigmaX_range = np.array([0.5, 1, 1.5, 2])  # Possible sigmaX values
+
+# Convert the ksize and sigmaX values into feature vectors for SGD
+X_train = np.array([[k, s] for k in ksize_range for s in sigmaX_range])
+
+# Flatten the noisy images for input
+y_train = []
+for ksize, sigmaX in X_train:
+    loss = loss_function(int(ksize), sigmaX, noisy_image_1, noisy_image_2)
+    y_train.append(loss)
+
+# Training data (input is kernel size and sigmaX, target is the loss value)
+y_train = np.array(y_train)
+
+# Train using SGDRegressor
+sgd = SGDRegressor(max_iter=1000, tol=1e-6)
+sgd.fit(X_train, y_train)
+
+# Predict the optimal kernel size and sigmaX
+optimal_params = sgd.coef_
+
+# Use the optimal parameters to denoise
+optimal_ksize = int(np.clip(optimal_params[0], 3, 9))  # Ensure ksize is odd and within valid range
+optimal_sigmaX = np.clip(optimal_params[1], 0.5, 2)  # Ensure sigmaX is within valid range
+
+# Apply Gaussian smoothing with the optimal parameters
+best_denoised_image = apply_gaussian_smoothing(noisy_image_1, optimal_ksize, optimal_sigmaX)
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.figure()
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f"Best Denoised Image\nKsize={optimal_ksize}, SigmaX={optimal_sigmaX}")
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 768x480 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-18-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="review_files/figure-html/cell-18-output-2.png" width="662" height="419" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="64e51ce9" class="cell markdown">
+<p>This attempt is to Compare the quality of denoising with SG descent method.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [18]:</pre></div><div id="65e0eb88" class="cell" data-execution_count="18">
+<pre><code>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_squared_error
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')
+    psnr = 20 * np.log10(255.0 / np.sqrt(mse))
+    return psnr
+
+# Noisy images
+noisy_image1 = add_gaussian_noise(clean_image, sigma=20)
+noisy_image2 = add_gaussian_noise(clean_image, sigma=20)
+
+# Denoiser function (optimized parameters using sklearn)
+def denoiser(theta, noisy_image):
+    return cv2.GaussianBlur(noisy_image, (int(theta[0]), int(theta[0])), sigmaX=theta[1])
+
+# Cost function
+def cost_function(theta, noisy_image1, noisy_image2):
+    denoised_image = denoiser(theta, noisy_image1)
+    return np.mean((denoised_image - noisy_image2) ** 2)
+
+# Gradient Descent optimization using sklearn
+def optimize_parameters(noisy_image1, noisy_image2, initial_theta):
+    sgd = SGDRegressor(max_iter=1000, tol=1e-3, learning_rate='adaptive')
+    
+    # Reshape theta and noisy_image for fitting
+    noisy_image1_flat = noisy_image1.flatten()
+    noisy_image2_flat = noisy_image2.flatten()
+    
+    X = np.vstack([noisy_image1_flat, noisy_image2_flat]).T
+    y = noisy_image2_flat
+    
+    sgd.fit(X, y)
+    
+    # Optimized parameters (theta)
+    optimized_theta = sgd.coef_
+    
+    return optimized_theta
+
+# Initial theta parameters (manually tuned)
+initial_theta = [5, 1.0]  # Example: Kernel size 5, sigmaX = 1.0
+
+# Optimize the parameters
+optimized_theta = optimize_parameters(noisy_image1, noisy_image2, initial_theta)
+
+# Apply the denoiser with optimized parameters
+denoised_image = denoiser(optimized_theta, noisy_image1)
+
+# Compute PSNR between the clean image and the denoised image
+psnr_value = compute_psnr(clean_image, denoised_image)
+
+# Display the PSNR value
+print(f"PSNR value between the clean image and the denoised image: {psnr_value:.2f} dB")
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(denoised_image, cmap='gray')
+plt.title(f"Denoised Image (PSNR: {psnr_value:.2f} dB)")
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>PSNR value between the clean image and the denoised image: 31.44 dB</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div class="">
+<figure class="figure">
+<p class=""><a href="review_files/figure-html/cell-19-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="review_files/figure-html/cell-19-output-2.png" width="758" height="455" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="fe715b16" class="cell markdown">
+<p>Instead of using the default optimizer, let’s try the finite difference approach for numerical differentiation. This approach is purely depended on the function values rather than its mathematical definition. So, computationally it will be more dependable. Improved code with fine tuning gradient descent with finite difference is shown below.</p>
+</div>
+<div class="cell-container"><div class="cell-decorator"><pre>In [19]:</pre></div><div id="cell-fig-denoising-plot" class="cell" data-execution_count="19">
+<pre><code>#| label: fig-denoising-plot
+#| fig-cap: Example of denoising results.
+#| fig-alt: A visualization of parameter fine tuning.
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+clean_image = cv2.imread('/manuscript-template-vscode-main/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)  # Ensure size is at least 1
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Gradient descent optimizer
+def gradient_descent(noisy_image1, noisy_image2, initial_theta, alpha=0.01, iterations=100):
+    theta = np.array(initial_theta)
+    for _ in range(iterations):
+        grad_kernel, grad_sigma = compute_gradients(noisy_image1, noisy_image2, theta)
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+        theta[0] = valid_kernel_size(theta[0])
+    return theta
+
+# Compute numerical gradients
+def compute_gradients(noisy_image1, noisy_image2, theta):
+    epsilon = 1e-5
+    cost_1 = cost_function([theta[0] + epsilon, theta[1]], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0] - epsilon, theta[1]], noisy_image1, noisy_image2)
+    grad_kernel = (cost_1 - cost_2) / (2 * epsilon)
+    
+    cost_1 = cost_function([theta[0], theta[1] + epsilon], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0], theta[1] - epsilon], noisy_image1, noisy_image2)
+    grad_sigma = (cost_1 - cost_2) / (2 * epsilon)
+    
+    return grad_kernel, grad_sigma
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Using scipy's minimize function
+initial_theta = [15, 1]  # Initial guess for kernel size and sigmaX
+result = minimize(cost_function, initial_theta, args=(noisy_images[0], noisy_images[1]), method='BFGS')
+optimized_theta_scipy = result.x
+optimized_denoised_image_scipy = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_scipy[0]), optimized_theta_scipy[1])
+
+# Using manual gradient descent optimization
+optimized_theta_gd = gradient_descent(noisy_images[0], noisy_images[1], initial_theta, alpha=0.01, iterations=100)
+optimized_denoised_image_gd = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_gd[0]), optimized_theta_gd[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_scipy = compute_psnr(optimized_denoised_image_scipy, clean_image)
+psnr_gd = compute_psnr(optimized_denoised_image_gd, clean_image)
+psnr_noisy=compute_psnr(noisy_images[0], clean_image)
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image-1\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_scipy, cmap='gray')
+plt.title(f'Scipy Optimizer\nPSNR: {psnr_scipy:.2f}')
+plt.axis('off')
+# Plot denoised image by manual gradient descent
+plt.subplot(2, 2, 3)
+plt.imshow(optimized_denoised_image_gd, cmap='gray')
+plt.title(f'Gradient Descent\nPSNR: {psnr_gd:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+plt.tight_layout()
+plt.show()</code></pre>
+<div class="cell-output cell-output-display">
+<div id="fig-denoising-plot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A visualization of parameter fine tuning.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-denoising-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca" class="">
+<a href="review_files/figure-html/fig-denoising-plot-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22" title="Example of denoising results."><img src="review_files/figure-html/fig-denoising-plot-output-1.png" alt="A visualization of parameter fine tuning." width="526" height="471" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-denoising-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Example of denoising results.
+</figcaption>
+</figure>
+</div>
+</div>
+</div></div>
+<div id="5ca54325" class="cell markdown">
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A Missing element
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In all these fine-tuning implementations, we started with a initial <span class="math inline">\(\theta\)</span>, which is neither relevant to the nosy images nor the clean image. So, the accuracy of the estimated parameters may not be realistic. A solution to this drawback in the fine tuning is given in the article. <em>… For initialization, we use a fixed <span class="math inline">\(\theta_0\)</span>, found by manually tuning <span class="math inline">\(\theta\)</span> for a single image from the BS400 dataset</em>.</p>
+</div>
+</div>
+</div>
+</section>
+     </main>
+<!-- /main column -->  <script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","loop":false,"openEffect":"zoom","descPosition":"bottom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script> 
+  
+</body></html>

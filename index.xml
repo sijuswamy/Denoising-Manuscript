@@ -1,0 +1,2709 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving
+and Interchange DTD v1.2 20190208//EN" "JATS-archivearticle1.dtd">
+
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" dtd-version="1.2" article-type="other">
+
+<front>
+<journal-meta>
+<journal-id></journal-id>
+
+<journal-title-group>
+<journal-title>Center for Computational Engineering and
+Networking</journal-title>
+</journal-title-group>
+<issn></issn>
+
+<publisher>
+<publisher-name></publisher-name>
+</publisher>
+</journal-meta>
+
+
+<article-meta>
+
+
+<title-group>
+<article-title>Automatic Turning of Denoising Algorithms Parameters
+Without Ground Truth</article-title>
+<subtitle>An initial review for literature survey</subtitle>
+</title-group>
+
+<contrib-group>
+<contrib contrib-type="author" corresp="yes">
+<contrib-id contrib-id-type="orcid">0009-0004-1983-5574</contrib-id>
+<name>
+<surname>S</surname>
+<given-names>Siju K</given-names>
+</name>
+<string-name>Siju K S</string-name>
+
+<email>ks_siju@cb.students.amrita.edu</email>
+<role vocab="https://credit.niso.org" vocab-term="investigation" vocab-term-identifier="https://credit.niso.org/contributor-roles/investigation/">Investigation</role>
+<role vocab="https://credit.niso.org" vocab-term="project
+administration" vocab-term-identifier="https://credit.niso.org/contributor-roles/project-administration/">Project
+administration</role>
+<role vocab="https://credit.niso.org" vocab-term="software" vocab-term-identifier="https://credit.niso.org/contributor-roles/software/">Software</role>
+<role vocab="https://credit.niso.org" vocab-term="visualization" vocab-term-identifier="https://credit.niso.org/contributor-roles/visualization/">Visualization</role>
+<xref ref-type="aff" rid="aff-1">a</xref>
+<xref ref-type="aff" rid="aff-2">b</xref>
+<xref ref-type="corresp" rid="cor-1">&#x002A;</xref>
+</contrib>
+<contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">0000-0002-7859-8394</contrib-id>
+<name>
+<surname>V.</surname>
+<given-names>Dr. Vipin</given-names>
+</name>
+<string-name>Dr. Vipin V.</string-name>
+
+<role>Supervison</role>
+<xref ref-type="aff" rid="aff-3">c</xref>
+<xref ref-type="aff" rid="aff-2">b</xref>
+</contrib>
+</contrib-group>
+<aff id="aff-1">
+<institution-wrap>
+<institution>School of Artifical Intelligence</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+<aff id="aff-2">
+<institution-wrap>
+<institution>Amrita Vishwa Vidyapeetham</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+<aff id="aff-3">
+<institution-wrap>
+<institution>School of Artificial Intelligence</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+<author-notes>
+<corresp id="cor-1">ks_siju@cb.students.amrita.edu</corresp>
+</author-notes>
+
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2024-09-17">
+<year>2024</year>
+<month>9</month>
+<day>17</day>
+</pub-date>
+
+
+
+
+
+
+
+<history></history>
+
+
+<abstract>
+<p>This review explores the mathematical concepts, noise types, and
+denoising algorithms, focusing on additive Gaussian noise. The paper’s
+methodology was reproduced using Gaussian smoothing, with MSE and PSNR
+metrics. Optimization of the error function was performed using various
+techniques, including gradient descent and <monospace>scipy</monospace>
+minimization, highlighting the performance of simple denoisers.</p>
+</abstract>
+<kwd-group kwd-group-type="author">
+<kwd>Bilevel optimization</kwd>
+<kwd>Denoising</kwd>
+<kwd>Hyper-parameter tuning</kwd>
+<kwd>Additive noise</kwd>
+<kwd>Gaussian smoothing</kwd>
+<kwd>Denoising algorithms</kwd>
+<kwd>Mean squared error (MSE)</kwd>
+<kwd>Peak signal-to-noise ratio (PSNR)</kwd>
+<kwd>Gradient descent</kwd>
+<kwd>Finite difference method</kwd>
+<kwd>Optimization</kwd>
+</kwd-group>
+
+
+
+
+</article-meta>
+
+</front>
+
+<body>
+<sec id="introduction">
+  <title>1. Introduction</title>
+  <p>This review undertakes a detailed exploration of the paper titled
+  <italic>Automatic Tuning of Denoising Algorithms Parameters without
+  Ground Truth</italic>. The primary objective of this work is not to
+  propose a novel denoiser but rather to develop a framework for
+  automatically tuning the hyperparameters of existing denoising
+  algorithms using only the noisy input image, eliminating the need for
+  clean reference images. This paradigm shift offers a unique
+  unsupervised approach to parameter selection, which is of significant
+  interest in real-world applications where ground truth images are
+  often unavailable.</p>
+</sec>
+<sec id="background-and-inspritaion-for-the-work">
+  <title>2. Background and inspritaion for the work</title>
+  <p>This work is inspired by the supervised models like
+  <italic>Noise2Noise (N2N)</italic> and <italic>Noise as Clean
+  (NaC)</italic> , have been successful in estimating the denoised
+  images through carefully defined loss functions optimized with access
+  to clean or synthetic reference images. In contrast, the proposed
+  method introduces novel <italic>unsupervised loss functions</italic>
+  that allow the system to infer optimal hyperparameters directly from
+  the noisy data.</p>
+</sec>
+<sec id="core-contents">
+  <title>3. Core Contents</title>
+  <p>This review attempts to recreate and dissect the theoretical
+  framework and algorithmic implementations discussed in the paper. In
+  particular, I focus on the key differences between the proposed method
+  and the following models:</p>
+  <sec id="reference-models">
+    <title>3.1 Reference models</title>
+    <list list-type="bullet">
+      <list-item>
+        <p><bold>Noise2Noise (N2N)</bold>: A supervised learning method
+        where the target output is a noisy version of the input image,
+        and the denoising model learns to map between these noisy
+        inputs.</p>
+      </list-item>
+      <list-item>
+        <p><bold>Noise as Clean (NaC)</bold>: Where the noisy input is
+        treated as if it were clean, allowing for simpler loss function
+        optimizations but often at the loss of performance.</p>
+      </list-item>
+      <list-item>
+        <p><bold>Noiser to Noise (Nr2N)</bold>: A semi-supervised
+        approach where multiple noisy versions of the same image are
+        used to train the denoiser.</p>
+      </list-item>
+      <list-item>
+        <p><bold>R2R</bold>: A more robust method that uses random
+        rotations to regularize and train the model for better
+        generalization in real-world scenarios.</p>
+      </list-item>
+    </list>
+  </sec>
+  <sec id="major-contribution">
+    <title>3.2 Major contribution</title>
+    <p>The critical contribution of the reviewed paper lies in proposing
+    alternative <italic>unsupervised loss functions</italic> and an
+    <italic>inference scheme</italic> that automatically selects the
+    hyperparameters such that the results empirically match those
+    obtained through supervised methods. This approach demonstrates that
+    comparable performance to supervised models can be achieved without
+    access to clean reference data, leading to a potential breakthrough
+    in how denoising algorithms are deployed in practical scenarios.</p>
+  </sec>
+  <sec id="review-approach">
+    <title>3.3 Review approach</title>
+    <p>This review compares the following aspects of the proposed
+    methodology with existing denoising techniques:</p>
+    <list list-type="order">
+      <list-item>
+        <p><italic>loss Function Definition and Optimization</italic>:
+        Unlike the supervised models, where loss functions like Mean
+        Squared Error (MSE) or structural similarity are optimized
+        against clean images, the unsupervised loss functions in this
+        paper rely on indirect metrics such as residual variance and
+        image sharpness to estimate the quality of the denoised
+        output.</p>
+      </list-item>
+      <list-item>
+        <p><italic>Inference Scheme</italic>: While supervised methods
+        explicitly optimize their denoising algorithms based on the
+        availability of paired clean and noisy data, the proposed
+        inference scheme iteratively adjusts hyperparameters using
+        gradient-based optimization on the unsupervised loss functions.
+        The optimization process aims to converge on the denoised image
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[\hat{x} \coloneqq x^*]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>x</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo>≔</mml:mo><mml:msup><mml:mi>x</mml:mi><mml:mo>*</mml:mo></mml:msup></mml:mrow></mml:math></alternatives></inline-formula>,
+        which matches the empirical quality of the ground truth.</p>
+      </list-item>
+    </list>
+    <sec id="general-form-of-loss-function">
+      <title>3.3.1 General Form of loss function</title>
+      <p>Denoising algorithms are of the form
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[A_\theta (y)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      , where <inline-formula><alternatives>
+      <tex-math><![CDATA[\theta\in \mathbb{R}^d]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>θ</mml:mi><mml:mo>∈</mml:mo><mml:msup><mml:mi>ℝ</mml:mi><mml:mi>d</mml:mi></mml:msup></mml:mrow></mml:math></alternatives></inline-formula>.
+      To estimate the parameter <inline-formula><alternatives>
+      <tex-math><![CDATA[\theta]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>
+      mostly generate mappings of the form <disp-formula><alternatives>
+      <tex-math><![CDATA[\Theta_\lambda:y\longrightarrow \theta]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>Θ</mml:mi><mml:mi>λ</mml:mi></mml:msub><mml:mo>:</mml:mo><mml:mi>y</mml:mi><mml:mo>→</mml:mo><mml:mi>θ</mml:mi></mml:mrow></mml:math></alternatives></disp-formula>
+      with parameters <inline-formula><alternatives>
+      <tex-math><![CDATA[\lambda\in \mathbb{R}^d]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>λ</mml:mi><mml:mo>∈</mml:mo><mml:msup><mml:mi>ℝ</mml:mi><mml:mi>d</mml:mi></mml:msup></mml:mrow></mml:math></alternatives></inline-formula>.
+      In short, this mapping maps image and its features to the set of
+      parameters.</p>
+      <p>These mapping parameters are found by optimizing the average
+      error produced by a discrepancy function,
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[\mathcal{L}]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ℒ</mml:mi></mml:math></alternatives></inline-formula>.
+      Using the modern computational terminology, this process is to
+      find the optimal parameters, <inline-formula><alternatives>
+      <tex-math><![CDATA[\lambda^*]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msup><mml:mi>λ</mml:mi><mml:mo>*</mml:mo></mml:msup></mml:math></alternatives></inline-formula>
+      such that <disp-formula><alternatives>
+      <tex-math><![CDATA[\lambda^*=\underset{\lambda\in \mathbb{R}^d}{\mathrm{argmin}}\,  \mathbb{E}\left(\mathcal{L}(A_{\theta_\lambda}(y)(y),x)\right)]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>λ</mml:mi><mml:mo>*</mml:mo></mml:msup><mml:mo>=</mml:mo><mml:munder><mml:mrow><mml:mi mathvariant="normal">a</mml:mi><mml:mi mathvariant="normal">r</mml:mi><mml:mi mathvariant="normal">g</mml:mi><mml:mi mathvariant="normal">m</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">n</mml:mi></mml:mrow><mml:mrow><mml:mi>λ</mml:mi><mml:mo>∈</mml:mo><mml:msup><mml:mi>ℝ</mml:mi><mml:mi>d</mml:mi></mml:msup></mml:mrow></mml:munder><mml:mspace width="0.167em"></mml:mspace><mml:mi>𝔼</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ℒ</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>A</mml:mi><mml:msub><mml:mi>θ</mml:mi><mml:mi>λ</mml:mi></mml:msub></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>,</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>Previous approaches demand a dataset for training. But this may
+      not be possible in real situations. The new approach proposed in
+      this article is unsupervised and is in line with the supervised
+      models proposed in Noise to Noise (N2N), Noise as Clean (NaC),
+      Noiser to Noise (Nr2N) and Recorrupted to Recorrupted (R2R).</p>
+      <p>Main thread of the work is that this novel approach defined an
+      un-supervised loss (not depends on the ground truth
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[x]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math></alternatives></inline-formula>),
+      achieving the same minimizer <inline-formula><alternatives>
+      <tex-math><![CDATA[\lambda^*]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msup><mml:mi>λ</mml:mi><mml:mo>*</mml:mo></mml:msup></mml:math></alternatives></inline-formula>
+      as the supervised counterpart.</p>
+    </sec>
+    <sec id="context-of-the-work">
+      <title>3.3.2 Context of the work</title>
+      <p>The inspired works are supervised and have the disadvantages of
+      overfitting and (or) non-generalizability with reference to a
+      finite dataset <inline-formula><alternatives>
+      <tex-math><![CDATA[\Omega_{i,j}]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>Ω</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi></mml:mrow></mml:msub></mml:math></alternatives></inline-formula>.
+      Authors claim that, in the proposed unsupervised approach the
+      parameters are time tuned and directly optimizing the loss
+      function. The work is divided into two stages:</p>
+      <list list-type="order">
+        <list-item>
+          <p>Define the loss function <inline-formula><alternatives>
+          <tex-math><![CDATA[A_\theta]]></tex-math>
+          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+          in various setups with low
+          cardinality(<inline-formula><alternatives>
+          <tex-math><![CDATA[\theta]]></tex-math>
+          <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>)/
+          pixel values.</p>
+        </list-item>
+        <list-item>
+          <p>Solve the optimization problem (minimizing the loss
+          function using gradient descent method). For the gradient
+          calculations, the have used automatic differentiation.</p>
+        </list-item>
+      </list>
+    </sec>
+  </sec>
+  <sec id="loss-functions-and-inference-schemes">
+    <title>3.4 Loss functions and Inference schemes</title>
+    <p>With reference to the four published articles, the authors
+    proposed the following loss functions and inference schemes. Here
+    they consider two noisy images.</p>
+    <list list-type="order">
+      <list-item>
+        <p><italic>Noise to Noise</italic>:
+        (<xref alt="Lehtinen 2018" rid="ref-lehtinen2018noise2noise" ref-type="bibr">Lehtinen
+        2018</xref>)</p>
+      </list-item>
+    </list>
+    <p>The loss function is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\, ||A_\theta (y)-y'||^2_2]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo>=</mml:mo><mml:munder><mml:mrow><mml:mi mathvariant="normal">a</mml:mi><mml:mi mathvariant="normal">r</mml:mi><mml:mi mathvariant="normal">g</mml:mi><mml:mi mathvariant="normal">m</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">n</mml:mi></mml:mrow><mml:mi>θ</mml:mi></mml:munder><mml:mspace width="0.167em"></mml:mspace><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:mi>y</mml:mi><mml:mi>′</mml:mi><mml:msubsup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn><mml:mn>2</mml:mn></mml:msubsup></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>and the inference scheme is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[x^{N2N}\coloneqq A_{\hat{\theta}}(y)\simeq x^*]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>x</mml:mi><mml:mrow><mml:mi>N</mml:mi><mml:mn>2</mml:mn><mml:mi>N</mml:mi></mml:mrow></mml:msup><mml:mo>≔</mml:mo><mml:msub><mml:mi>A</mml:mi><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>≃</mml:mo><mml:msup><mml:mi>x</mml:mi><mml:mo>*</mml:mo></mml:msup></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>were <inline-formula><alternatives>
+    <tex-math><![CDATA[y]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>y</mml:mi></mml:math></alternatives></inline-formula>
+    and <inline-formula><alternatives>
+    <tex-math><![CDATA[y']]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mi>′</mml:mi></mml:mrow></mml:math></alternatives></inline-formula>
+    are two noisy data defined by <inline-formula><alternatives>
+    <tex-math><![CDATA[y=x+n_1]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:msub><mml:mi>n</mml:mi><mml:mn>1</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+    and <inline-formula><alternatives>
+    <tex-math><![CDATA[y'=x+n_2]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mi>′</mml:mi><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:msub><mml:mi>n</mml:mi><mml:mn>2</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>.</p>
+    <list list-type="order">
+      <list-item>
+        <label>2.</label>
+        <p><italic>Noisy as
+        Clean</italic>:(<xref alt="Xu et al. 2020" rid="ref-9210208" ref-type="bibr">Xu
+        et al. 2020</xref>) The loss function is</p>
+      </list-item>
+    </list>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\, ||A_\theta (z)-y'||^2_2]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo>=</mml:mo><mml:munder><mml:mrow><mml:mi mathvariant="normal">a</mml:mi><mml:mi mathvariant="normal">r</mml:mi><mml:mi mathvariant="normal">g</mml:mi><mml:mi mathvariant="normal">m</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">n</mml:mi></mml:mrow><mml:mi>θ</mml:mi></mml:munder><mml:mspace width="0.167em"></mml:mspace><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>z</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:mi>y</mml:mi><mml:mi>′</mml:mi><mml:msubsup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn><mml:mn>2</mml:mn></mml:msubsup></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>and the inference scheme is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[x^{NaC}\coloneqq A_{\hat{\theta}}(y)\simeq x^*]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>x</mml:mi><mml:mrow><mml:mi>N</mml:mi><mml:mi>a</mml:mi><mml:mi>C</mml:mi></mml:mrow></mml:msup><mml:mo>≔</mml:mo><mml:msub><mml:mi>A</mml:mi><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>≃</mml:mo><mml:msup><mml:mi>x</mml:mi><mml:mo>*</mml:mo></mml:msup></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>where <inline-formula><alternatives>
+    <tex-math><![CDATA[z]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>z</mml:mi></mml:math></alternatives></inline-formula>
+    is a dobly noisy data defined by <inline-formula><alternatives>
+    <tex-math><![CDATA[z=y+n_s]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>z</mml:mi><mml:mo>=</mml:mo><mml:mi>y</mml:mi><mml:mo>+</mml:mo><mml:msub><mml:mi>n</mml:mi><mml:mi>s</mml:mi></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>.</p>
+    <list list-type="order">
+      <list-item>
+        <label>3.</label>
+        <p><italic>Noiser to Noise</italic>:
+        (<xref alt="Moran et al. 2020" rid="ref-9156650" ref-type="bibr">Moran
+        et al. 2020</xref>)</p>
+      </list-item>
+    </list>
+    <p>The loss function is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\mathbb{E} \left(||A_\theta (z)-y'||^2_2\right)]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo>=</mml:mo><mml:munder><mml:mrow><mml:mi mathvariant="normal">a</mml:mi><mml:mi mathvariant="normal">r</mml:mi><mml:mi mathvariant="normal">g</mml:mi><mml:mi mathvariant="normal">m</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">n</mml:mi></mml:mrow><mml:mi>θ</mml:mi></mml:munder><mml:mspace width="0.167em"></mml:mspace><mml:mi>𝔼</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>z</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:mi>y</mml:mi><mml:mi>′</mml:mi><mml:msubsup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>and the inference scheme is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[x^{Nr2R}\coloneqq \frac{(1+\alpha^2)A_\theta(z)-z}{\alpha^2}]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>x</mml:mi><mml:mrow><mml:mi>N</mml:mi><mml:mi>r</mml:mi><mml:mn>2</mml:mn><mml:mi>R</mml:mi></mml:mrow></mml:msup><mml:mo>≔</mml:mo><mml:mfrac><mml:mrow><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>1</mml:mn><mml:mo>+</mml:mo><mml:msup><mml:mi>α</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>z</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:mi>z</mml:mi></mml:mrow><mml:msup><mml:mi>α</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mfrac></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <boxed-text>
+    <p><bold>Note</bold></p>
+    <p>This approach has no restriction on noise except additive one.
+    But the noise level may high. To mitigate this artificially high
+    noise, lower the variance level of <inline-formula><alternatives>
+    <tex-math><![CDATA[n_s]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>n</mml:mi><mml:mi>s</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+    as <inline-formula><alternatives>
+    <tex-math><![CDATA[n_s\sim \mathcal{N}(0,\alpha\sigma)]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>n</mml:mi><mml:mi>s</mml:mi></mml:msub><mml:mo>∼</mml:mo><mml:mi>𝒩</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>0</mml:mn><mml:mo>,</mml:mo><mml:mi>α</mml:mi><mml:mi>σ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>.</p>
+    </boxed-text>
+    <list list-type="order">
+      <list-item>
+        <label>4.</label>
+        <p><italic>Recurrupted to Recurrupted</italic>:
+        (<xref alt="Pang et al. 2021" rid="ref-9577798" ref-type="bibr">Pang
+        et al. 2021</xref>)</p>
+      </list-item>
+    </list>
+    <p>In this reference, the noisy images are ‘doubly noisy’ images
+    created from the clear image as with <inline-formula><alternatives>
+    <tex-math><![CDATA[D]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>D</mml:mi></mml:math></alternatives></inline-formula>
+    being any invertible matrix and <inline-formula><alternatives>
+    <tex-math><![CDATA[n_s]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>n</mml:mi><mml:mi>s</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+    drawn from same distribution of <inline-formula><alternatives>
+    <tex-math><![CDATA[n]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>n</mml:mi></mml:math></alternatives></inline-formula>.</p>
+    <p>As a result, <inline-formula><alternatives>
+    <tex-math><![CDATA[z_1=x+n_1]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>z</mml:mi><mml:mn>1</mml:mn></mml:msub><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:msub><mml:mi>n</mml:mi><mml:mn>1</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+    and <inline-formula><alternatives>
+    <tex-math><![CDATA[z_2=x+n_2]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>z</mml:mi><mml:mn>2</mml:mn></mml:msub><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:msub><mml:mi>n</mml:mi><mml:mn>2</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>,
+    where <inline-formula><alternatives>
+    <tex-math><![CDATA[n_1]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>n</mml:mi><mml:mn>1</mml:mn></mml:msub></mml:math></alternatives></inline-formula>
+    and <inline-formula><alternatives>
+    <tex-math><![CDATA[n_2]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>n</mml:mi><mml:mn>2</mml:mn></mml:msub></mml:math></alternatives></inline-formula>
+    are two zero mean independent noise vectors.</p>
+    <p>The loss function is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[ \hat{\theta}=\underset{\theta}{\mathrm{argmin}}\,\mathbb{E} \left(||A_{\hat{\theta}} (z_1)-z_2||^2_2\right)]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo>=</mml:mo><mml:munder><mml:mrow><mml:mi mathvariant="normal">a</mml:mi><mml:mi mathvariant="normal">r</mml:mi><mml:mi mathvariant="normal">g</mml:mi><mml:mi mathvariant="normal">m</mml:mi><mml:mi mathvariant="normal">i</mml:mi><mml:mi mathvariant="normal">n</mml:mi></mml:mrow><mml:mi>θ</mml:mi></mml:munder><mml:mspace width="0.167em"></mml:mspace><mml:mi>𝔼</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>z</mml:mi><mml:mn>1</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:msub><mml:mi>z</mml:mi><mml:mn>2</mml:mn></mml:msub><mml:msubsup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>and the inference scheme is</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[x^{Nr2R}\coloneqq \frac{1}{M}\sum\limits_{m=1}^MA_{\hat{\theta}}(Z_1^m)]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>x</mml:mi><mml:mrow><mml:mi>N</mml:mi><mml:mi>r</mml:mi><mml:mn>2</mml:mn><mml:mi>R</mml:mi></mml:mrow></mml:msup><mml:mo>≔</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mi>M</mml:mi></mml:mfrac><mml:munderover><mml:mo>∑</mml:mo><mml:mrow><mml:mi>m</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mi>M</mml:mi></mml:munderover><mml:msub><mml:mi>A</mml:mi><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msubsup><mml:mi>Z</mml:mi><mml:mn>1</mml:mn><mml:mi>m</mml:mi></mml:msubsup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <sec id="optimization-of-loss-function">
+      <title>3.4.1 Optimization of loss function</title>
+      <p>For the optimization, the authors used gradient based approach.
+      For the evaluation of gradient, they used automatic
+      differentiation and the iterative formula for
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[\theta]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>
+      update is:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[\theta^{n+1}=\theta_n-\eta \nabla \hat{\theta}]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msup><mml:mi>θ</mml:mi><mml:mrow><mml:mi>n</mml:mi><mml:mo>+</mml:mo><mml:mn>1</mml:mn></mml:mrow></mml:msup><mml:mo>=</mml:mo><mml:msub><mml:mi>θ</mml:mi><mml:mi>n</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:mi>η</mml:mi><mml:mi>∇</mml:mi><mml:mover><mml:mi>θ</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>Here <inline-formula><alternatives>
+      <tex-math><![CDATA[theta_0]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>t</mml:mi><mml:mi>h</mml:mi><mml:mi>e</mml:mi><mml:mi>t</mml:mi><mml:msub><mml:mi>a</mml:mi><mml:mn>0</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>,
+      the initial parameter measure is found by manually tuning
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[\theta]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>
+      for a single image.</p>
+    </sec>
+    <sec id="presented-use-case">
+      <title>3.4.2 Presented use case</title>
+      <p>Authors used the proposed method on the denoiser,
+      <italic>Denoising via Quantum Interactive Patches</italic>
+      (DeQuIP) to fine tune the parameters. Implementation is done on
+      <monospace>PyTorch 1.12.0</monospace> with BSD400 datasets as
+      ground truth. Unfortunately, <monospace>Pytorch 1.12.0</monospace>
+      is not connected to <monospace>Python 11.2</monospace> version. As
+      per authors claim, the proposed approach makes it possible to
+      obtain an average PSNR output within less than 1% of the best
+      achievable PSNR. In this review work, a miniature model is
+      developed using the authors concept.</p>
+      <fig id="fig-denoising-plot">
+        <caption><p>Figure 1: Example of denoising
+        results.</p></caption>
+        <graphic mimetype="image" mime-subtype="png" xlink:href="index_files/figure-jats/notebooks-review-fig-denoising-plot-output-1.png" />
+      </fig>
+      <p>Skill of the proposed alogorithm on the same sample image used
+      by the author is shown in
+      <xref alt="Figure 1" rid="fig-denoising-plot">Figure 1</xref></p>
+    </sec>
+  </sec>
+</sec>
+<sec id="conclusion">
+  <title>4. Conclusion</title>
+  <p>The review examined several influential works that inspired the
+  authors’ unsupervised denoising framework, including Noise2Noise
+  (N2N), Noise as Clean (NaC), and Noise2Noise Regression (Nr2N). These
+  models demonstrated how effective denoising can be achieved without
+  relying on clean ground-truth images, focusing solely on noisy data.
+  By building on these ideas, the authors introduced novel unsupervised
+  cost functions and inference schemes to match the performance of
+  supervised denoising models. Using Gaussian smoothing as a basic case
+  study, the review reproduced these methods and explored the
+  optimization of the error functions through scipy minimization and
+  custom gradient descent. Metrics such as MSE and PSNR provided a
+  comparative analysis, reinforcing that while the unsupervised method
+  closely mirrors the results of supervised models, further refinement
+  is needed to fully realize its potential in more complex
+  scenarios.</p>
+</sec>
+</body>
+
+<back>
+<ref-list>
+  <title>5. References</title>
+  <ref id="ref-knuth84">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Knuth</surname><given-names>Donald E.</given-names></name>
+      </person-group>
+      <article-title>Literate programming</article-title>
+      <source>Comput. J.</source>
+      <publisher-name>Oxford University Press, Inc.</publisher-name>
+      <publisher-loc>USA</publisher-loc>
+      <year iso-8601-date="1984-05">1984</year><month>05</month>
+      <volume>27</volume>
+      <issue>2</issue>
+      <issn>0010-4620</issn>
+      <uri>https://doi.org/10.1093/comjnl/27.2.97</uri>
+      <pub-id pub-id-type="doi">10.1093/comjnl/27.2.97</pub-id>
+      <fpage>97</fpage>
+      <lpage>111</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-floquetU003Ahal-04344047">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Floquet</surname><given-names>Arthur</given-names></name>
+        <name><surname>Dutta</surname><given-names>Sayantan</given-names></name>
+        <name><surname>Soubies</surname><given-names>Emmanuel</given-names></name>
+        <name><surname>Pham</surname><given-names>Duong-Hung</given-names></name>
+        <name><surname>Kouamé</surname><given-names>Denis</given-names></name>
+        <name><surname>Kouame</surname><given-names>Denis</given-names></name>
+      </person-group>
+      <article-title>Automatic Tuning of Denoising Algorithms Parameters without Ground Truth</article-title>
+      <source>IEEE Signal Processing Letters</source>
+      <publisher-name>Institute of Electrical and Electronics Engineers</publisher-name>
+      <year iso-8601-date="2024-01">2024</year><month>01</month>
+      <volume>31</volume>
+      <uri>https://hal.science/hal-04344047</uri>
+      <pub-id pub-id-type="doi">10.1109/LSP.2024.3354554</pub-id>
+      <fpage>381 </fpage>
+      <lpage> 385</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-4271520">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Dabov</surname><given-names>Kostadin</given-names></name>
+        <name><surname>Foi</surname><given-names>Alessandro</given-names></name>
+        <name><surname>Katkovnik</surname><given-names>Vladimir</given-names></name>
+        <name><surname>Egiazarian</surname><given-names>Karen</given-names></name>
+      </person-group>
+      <article-title>Image denoising by sparse 3-d transform-domain collaborative filtering</article-title>
+      <source>IEEE Transactions on Image Processing</source>
+      <year iso-8601-date="2007">2007</year>
+      <volume>16</volume>
+      <issue>8</issue>
+      <pub-id pub-id-type="doi">10.1109/TIP.2007.901238</pub-id>
+      <fpage>2080</fpage>
+      <lpage>2095</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-7807310">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Selesnick</surname><given-names>Ivan</given-names></name>
+      </person-group>
+      <article-title>Total variation denoising via the moreau envelope</article-title>
+      <source>IEEE Signal Processing Letters</source>
+      <year iso-8601-date="2017">2017</year>
+      <volume>24</volume>
+      <issue>2</issue>
+      <pub-id pub-id-type="doi">10.1109/LSP.2017.2647948</pub-id>
+      <fpage>216</fpage>
+      <lpage>220</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-10222154">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Nguyen</surname><given-names>Pascal</given-names></name>
+        <name><surname>Soubies</surname><given-names>Emmanuel</given-names></name>
+        <name><surname>Chaux</surname><given-names>Caroline</given-names></name>
+      </person-group>
+      <article-title>Map-informed unrolled algorithms for hyper-parameter estimation</article-title>
+      <source>2023 IEEE international conference on image processing (ICIP)</source>
+      <year iso-8601-date="2023">2023</year>
+      <volume></volume>
+      <pub-id pub-id-type="doi">10.1109/ICIP49359.2023.10222154</pub-id>
+      <fpage>2160</fpage>
+      <lpage>2164</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-9210208">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Xu</surname><given-names>Jun</given-names></name>
+        <name><surname>Huang</surname><given-names>Yuan</given-names></name>
+        <name><surname>Cheng</surname><given-names>Ming-Ming</given-names></name>
+        <name><surname>Liu</surname><given-names>Li</given-names></name>
+        <name><surname>Zhu</surname><given-names>Fan</given-names></name>
+        <name><surname>Xu</surname><given-names>Zhou</given-names></name>
+        <name><surname>Shao</surname><given-names>Ling</given-names></name>
+      </person-group>
+      <article-title>Noisy-as-clean: Learning self-supervised denoising from corrupted image</article-title>
+      <source>IEEE Transactions on Image Processing</source>
+      <year iso-8601-date="2020">2020</year>
+      <volume>29</volume>
+      <issue></issue>
+      <pub-id pub-id-type="doi">10.1109/TIP.2020.3026622</pub-id>
+      <fpage>9316</fpage>
+      <lpage>9329</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-9156650">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Moran</surname><given-names>Nick</given-names></name>
+        <name><surname>Schmidt</surname><given-names>Dan</given-names></name>
+        <name><surname>Zhong</surname><given-names>Yu</given-names></name>
+        <name><surname>Coady</surname><given-names>Patrick</given-names></name>
+      </person-group>
+      <article-title>Noisier2Noise: Learning to denoise from unpaired noisy data</article-title>
+      <source>2020 IEEE/CVF conference on computer vision and pattern recognition (CVPR)</source>
+      <year iso-8601-date="2020">2020</year>
+      <volume></volume>
+      <pub-id pub-id-type="doi">10.1109/CVPR42600.2020.01208</pub-id>
+      <fpage>12061</fpage>
+      <lpage>12069</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-9577798">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Pang</surname><given-names>Tongyao</given-names></name>
+        <name><surname>Zheng</surname><given-names>Huan</given-names></name>
+        <name><surname>Quan</surname><given-names>Yuhui</given-names></name>
+        <name><surname>Ji</surname><given-names>Hui</given-names></name>
+      </person-group>
+      <article-title>Recorrupted-to-recorrupted: Unsupervised deep learning for image denoising</article-title>
+      <source>2021 IEEE/CVF conference on computer vision and pattern recognition (CVPR)</source>
+      <year iso-8601-date="2021">2021</year>
+      <volume></volume>
+      <pub-id pub-id-type="doi">10.1109/CVPR46437.2021.00208</pub-id>
+      <fpage>2043</fpage>
+      <lpage>2052</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-4598837">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Ramani</surname><given-names>Sathish</given-names></name>
+        <name><surname>Blu</surname><given-names>Thierry</given-names></name>
+        <name><surname>Unser</surname><given-names>Michael</given-names></name>
+      </person-group>
+      <article-title>Monte-carlo sure: A black-box optimization of regularization parameters for general denoising algorithms</article-title>
+      <source>IEEE Transactions on Image Processing</source>
+      <year iso-8601-date="2008">2008</year>
+      <volume>17</volume>
+      <issue>9</issue>
+      <pub-id pub-id-type="doi">10.1109/TIP.2008.2001404</pub-id>
+      <fpage>1540</fpage>
+      <lpage>1554</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-5484579">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Zhu</surname><given-names>Xiang</given-names></name>
+        <name><surname>Milanfar</surname><given-names>Peyman</given-names></name>
+      </person-group>
+      <article-title>Automatic parameter selection for denoising algorithms using a no-reference measure of image content</article-title>
+      <source>IEEE Transactions on Image Processing</source>
+      <year iso-8601-date="2010">2010</year>
+      <volume>19</volume>
+      <issue>12</issue>
+      <pub-id pub-id-type="doi">10.1109/TIP.2010.2052820</pub-id>
+      <fpage>3116</fpage>
+      <lpage>3132</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-9382109">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Dutta</surname><given-names>Sayantan</given-names></name>
+        <name><surname>Basarab</surname><given-names>Adrian</given-names></name>
+        <name><surname>Georgeot</surname><given-names>Bertrand</given-names></name>
+        <name><surname>Kouamé</surname><given-names>Denis</given-names></name>
+      </person-group>
+      <article-title>Quantum mechanics-based signal and image representation: Application to denoising</article-title>
+      <source>IEEE Open Journal of Signal Processing</source>
+      <year iso-8601-date="2021">2021</year>
+      <volume>2</volume>
+      <issue></issue>
+      <pub-id pub-id-type="doi">10.1109/OJSP.2021.3067507</pub-id>
+      <fpage>190</fpage>
+      <lpage>206</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-9506794">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Dutta</surname><given-names>Sayantan</given-names></name>
+        <name><surname>Basarab</surname><given-names>Adrian</given-names></name>
+        <name><surname>Georgeot</surname><given-names>Bertrand</given-names></name>
+        <name><surname>Kouamé</surname><given-names>Denis</given-names></name>
+      </person-group>
+      <article-title>Image denoising inspired by quantum many-body physics</article-title>
+      <source>2021 IEEE international conference on image processing (ICIP)</source>
+      <year iso-8601-date="2021">2021</year>
+      <volume></volume>
+      <pub-id pub-id-type="doi">10.1109/ICIP42928.2021.9506794</pub-id>
+      <fpage>1619</fpage>
+      <lpage>1623</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-8954066">
+    <element-citation publication-type="paper-conference">
+      <person-group person-group-type="author">
+        <name><surname>Krull</surname><given-names>Alexander</given-names></name>
+        <name><surname>Buchholz</surname><given-names>Tim-Oliver</given-names></name>
+        <name><surname>Jug</surname><given-names>Florian</given-names></name>
+      </person-group>
+      <article-title>Noise2Void - learning denoising from single noisy images</article-title>
+      <source>2019 IEEE/CVF conference on computer vision and pattern recognition (CVPR)</source>
+      <year iso-8601-date="2019">2019</year>
+      <volume></volume>
+      <pub-id pub-id-type="doi">10.1109/CVPR.2019.00223</pub-id>
+      <fpage>2124</fpage>
+      <lpage>2132</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-lehtinen2018noise2noise">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Lehtinen</surname><given-names>J</given-names></name>
+      </person-group>
+      <article-title>Noise2noise: Learning image restoration without clean data</article-title>
+      <source>arXiv preprint arXiv:1803.04189</source>
+      <year iso-8601-date="2018">2018</year>
+    </element-citation>
+  </ref>
+</ref-list>
+</back>
+
+<sub-article article-type="notebook" id="nb-4-nb-1">
+<front-stub>
+<title-group>
+<article-title>Basics of Noise</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<name>
+<surname>S</surname>
+<given-names>Siju K</given-names>
+</name>
+<string-name>Siju K S</string-name>
+
+<xref ref-type="aff" rid="aff-1-nb-1">a</xref>
+<xref ref-type="aff" rid="aff-2-nb-1">b</xref>
+<xref ref-type="aff" rid="aff-3-nb-1">c</xref>
+</contrib>
+</contrib-group>
+<aff id="aff-1-nb-1">
+<institution-wrap>
+<institution>Research Scholar</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+<aff id="aff-2-nb-1">
+<institution-wrap>
+<institution>Center for Computational Engineering &amp;
+Networking</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+<aff id="aff-3-nb-1">
+<institution-wrap>
+<institution>Amrita Vishwa Vidyapeetham</institution>
+</institution-wrap>
+
+
+
+
+
+
+
+</aff>
+</front-stub>
+
+<body>
+<sec id="basics-of-denoising-algorithms-nb-1">
+  <title>Basics of Denoising Algorithms</title>
+  <p>Noise is an unwanted random variation that interferes with the
+  underlying signal in an image or data. In the context of image
+  processing and denoising algorithms, noise introduces distortions that
+  degrade the visual quality of an image, making it challenging to
+  interpret or analyse the data accurately. Noise can arise from various
+  sources during image acquisition, transmission, or processing.
+  Understanding the types of noise and their mathematical
+  representations is essential for designing effective denoising
+  algorithms.</p>
+  <sec id="types-of-noise-nb-1">
+    <title>Types of Noise</title>
+    <sec id="additive-noise-nb-1">
+      <title>1. Additive Noise</title>
+      <p>Additive noise refers to noise that is simply added to the
+      original signal. This type of noise is mathematically expressed
+      as:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      y(i, j) = x(i, j) + n(i, j)
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>Where: - <inline-formula><alternatives>
+      <tex-math><![CDATA[y(i, j)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is the noisy image, - <inline-formula><alternatives>
+      <tex-math><![CDATA[x(i, j)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is the true, noise-free image, and -
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[n(i, j)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is the noise at pixel ((i, j)).</p>
+      <sec id="gaussian-noise-nb-1">
+        <title>Gaussian Noise</title>
+        <p>Gaussian noise is the most common type of additive noise. The
+        noise at each pixel follows a Gaussian distribution with mean
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[\mu]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>μ</mml:mi></mml:math></alternatives></inline-formula>
+        and variance <inline-formula><alternatives>
+        <tex-math><![CDATA[\sigma^2]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msup><mml:mi>σ</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:math></alternatives></inline-formula>:</p>
+        <p><disp-formula><alternatives>
+        <tex-math><![CDATA[
+        n(i, j) \sim \mathcal{N}(\mu, \sigma^2)
+        ]]></tex-math>
+        <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>∼</mml:mo><mml:mi>𝒩</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>μ</mml:mi><mml:mo>,</mml:mo><mml:msup><mml:mi>σ</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+        <p>In most cases, Gaussian noise is assumed to have zero mean
+        (<inline-formula><alternatives>
+        <tex-math><![CDATA[\mu = 0]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>μ</mml:mi><mml:mo>=</mml:mo><mml:mn>0</mml:mn></mml:mrow></mml:math></alternatives></inline-formula>),
+        making the noise purely random but distributed symmetrically
+        around zero.</p>
+      </sec>
+    </sec>
+    <sec id="multiplicative-noise-nb-1">
+      <title>2. Multiplicative Noise</title>
+      <p>Multiplicative noise, as the name suggests, multiplies the
+      signal rather than adding to it. This type of noise is often
+      encountered in systems like radar and ultrasound imaging. It can
+      be represented mathematically as:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      y(i, j) = x(i, j) \cdot n(i, j)
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>⋅</mml:mo><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <sec id="speckle-noise-nb-1">
+        <title>Speckle Noise</title>
+        <p>A specific example of multiplicative noise is <bold>speckle
+        noise</bold>, which typically arises in coherent imaging systems
+        like laser and ultrasound. It is often modelled as:</p>
+        <p><disp-formula><alternatives>
+        <tex-math><![CDATA[
+        n(i, j) \sim \mathcal{U}(1, \sigma)
+        ]]></tex-math>
+        <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>∼</mml:mo><mml:mi>𝒰</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>1</mml:mn><mml:mo>,</mml:mo><mml:mi>σ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+        <p>Where <inline-formula><alternatives>
+        <tex-math><![CDATA[\mathcal{U}(1, \sigma)]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>𝒰</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>1</mml:mn><mml:mo>,</mml:mo><mml:mi>σ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+        is a uniform distribution.</p>
+      </sec>
+    </sec>
+    <sec id="salt-and-pepper-noise-impulse-noise-nb-1">
+      <title>3. Salt-and-Pepper Noise (Impulse Noise)</title>
+      <p>Salt-and-pepper noise is a type of impulse noise where pixels
+      are randomly corrupted with extreme values (either 0 or 255 in an
+      8-bit grayscale image). This noise is represented as:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      y(i, j) =
+      \begin{cases}
+      0, & \text{with probability } p_1 \\
+      255, & \text{with probability } p_2 \\
+      x(i, j), & \text{otherwise}
+      \end{cases}
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mrow><mml:mo stretchy="true" form="prefix">{</mml:mo><mml:mtable><mml:mtr><mml:mtd columnalign="left" style="text-align: left"><mml:mn>0</mml:mn><mml:mo>,</mml:mo></mml:mtd><mml:mtd columnalign="left" style="text-align: left"><mml:mrow><mml:mtext mathvariant="normal">with probability </mml:mtext><mml:mspace width="0.333em"></mml:mspace></mml:mrow><mml:msub><mml:mi>p</mml:mi><mml:mn>1</mml:mn></mml:msub></mml:mtd></mml:mtr><mml:mtr><mml:mtd columnalign="left" style="text-align: left"><mml:mn>255</mml:mn><mml:mo>,</mml:mo></mml:mtd><mml:mtd columnalign="left" style="text-align: left"><mml:mrow><mml:mtext mathvariant="normal">with probability </mml:mtext><mml:mspace width="0.333em"></mml:mspace></mml:mrow><mml:msub><mml:mi>p</mml:mi><mml:mn>2</mml:mn></mml:msub></mml:mtd></mml:mtr><mml:mtr><mml:mtd columnalign="left" style="text-align: left"><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>,</mml:mo></mml:mtd><mml:mtd columnalign="left" style="text-align: left"><mml:mtext mathvariant="normal">otherwise</mml:mtext></mml:mtd></mml:mtr></mml:mtable></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>The pixels take on either the minimum or maximum values, making
+      this noise appear as white and black specks in an image.</p>
+    </sec>
+    <sec id="poisson-noise-shot-noise-nb-1">
+      <title>4. Poisson Noise (Shot Noise)</title>
+      <p>Poisson noise arises due to the discrete nature of photon
+      counting in imaging systems. It is signal-dependent, meaning the
+      amount of noise depends on the intensity of the signal. This is
+      expressed using the Poisson distribution:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      y(i, j) \sim \text{Poisson}(\lambda x(i, j))
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>∼</mml:mo><mml:mtext mathvariant="normal">Poisson</mml:mtext><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>λ</mml:mi><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>Here, <inline-formula><alternatives>
+      <tex-math><![CDATA[\lambda]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>λ</mml:mi></mml:math></alternatives></inline-formula>
+      is a scaling factor, and the noise follows a Poisson distribution
+      based on the true intensity value <inline-formula><alternatives>
+      <tex-math><![CDATA[x(i, j)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>.</p>
+    </sec>
+    <sec id="quantization-noise-nb-1">
+      <title>5. Quantization Noise</title>
+      <p>Quantization noise occurs during the digitization process,
+      where continuous signal values are rounded off to discrete levels.
+      This is typically modelled as additive noise with a uniform
+      distribution:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      n(i, j) \sim \mathcal{U}(-\Delta/2, \Delta/2)
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>n</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>∼</mml:mo><mml:mi>𝒰</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>−</mml:mi><mml:mi>Δ</mml:mi><mml:mi>/</mml:mi><mml:mn>2</mml:mn><mml:mo>,</mml:mo><mml:mi>Δ</mml:mi><mml:mi>/</mml:mi><mml:mn>2</mml:mn><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>Where <inline-formula><alternatives>
+      <tex-math><![CDATA[\Delta]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>Δ</mml:mi></mml:math></alternatives></inline-formula>
+      is the step size of the quantization process.</p>
+    </sec>
+  </sec>
+  <sec id="connection-to-denoising-algorithms-nb-1">
+    <title>Connection to Denoising Algorithms</title>
+    <p>Denoising algorithms are designed to estimate the clean signal
+    <inline-formula><alternatives>
+    <tex-math><![CDATA[x(i,j)]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>x</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+    from the noisy observations <inline-formula><alternatives>
+    <tex-math><![CDATA[y(i,j)]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>.
+    The type and characteristics of the noise play a crucial role in
+    selecting appropriate denoising methods. Some commonly used
+    denoising methods include:</p>
+    <list list-type="bullet">
+      <list-item>
+        <p><bold>Gaussian Smoothing</bold>: Ideal for Gaussian noise
+        removal,</p>
+      </list-item>
+      <list-item>
+        <p><bold>Median Filtering</bold>: Effective against
+        salt-and-pepper noise,</p>
+      </list-item>
+      <list-item>
+        <p><bold>Non-Local Means (NLM)</bold> and <bold>BM3D</bold>:
+        Advanced methods for a wide range of noise types.</p>
+      </list-item>
+    </list>
+  </sec>
+  <sec id="introduction-to-basic-denoising-algorithms-nb-1">
+    <title>Introduction to Basic Denoising Algorithms</title>
+    <p>Denoising algorithms are essential in image processing to remove
+    various types of noise that distort image quality. Each type of
+    noise (Gaussian, salt-and-pepper, multiplicative, Poisson, etc.)
+    demands different approaches. This section develops a conceptual
+    foundation for understanding the core denoising algorithms used to
+    tackle these noises. We explore their mathematical models,
+    functioning, and the rationale behind each method.</p>
+  </sec>
+  <sec id="denoising-algorithms-for-additive-noise-nb-1">
+    <title>Denoising Algorithms for Additive Noise</title>
+    <p>Several methods exist to remove or reduce additive noise in
+    images. Below are the most common techniques:</p>
+    <sec id="gaussian-smoothing-low-pass-filtering-nb-1">
+      <title>1. Gaussian Smoothing (Low-pass Filtering)</title>
+      <p>Gaussian smoothing is a linear filter that reduces noise by
+      averaging the pixels in the neighbourhood, weighted by a Gaussian
+      function. The denoised image can be computed as:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[ \hat{x}(i, j) = \sum_{k,l} G(k, l) y(i-k, j-l) ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>x</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:munder><mml:mo>∑</mml:mo><mml:mrow><mml:mi>k</mml:mi><mml:mo>,</mml:mo><mml:mi>l</mml:mi></mml:mrow></mml:munder><mml:mi>G</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>k</mml:mi><mml:mo>,</mml:mo><mml:mi>l</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>−</mml:mo><mml:mi>k</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo>−</mml:mo><mml:mi>l</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>where <disp-formula><alternatives>
+      <tex-math><![CDATA[G(k, l)]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>G</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>k</mml:mi><mml:mo>,</mml:mo><mml:mi>l</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula>
+      is the Gaussian kernel.</p>
+    </sec>
+    <sec id="median-filtering-nb-1">
+      <title>2. Median Filtering</title>
+      <p>Median filtering is a non-linear method where the value of each
+      pixel is replaced by the median value of the neighbouring pixels.
+      This is particularly effective for noise like salt-and-pepper
+      noise, but it can also handle Gaussian noise:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[ \hat{x}(i, j) = \text{median} \{ y(i+k, j+l) \} ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>x</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mtext mathvariant="normal">median</mml:mtext><mml:mo stretchy="false" form="prefix">{</mml:mo><mml:mi>y</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>+</mml:mo><mml:mi>k</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo>+</mml:mo><mml:mi>l</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="false" form="postfix">}</mml:mo></mml:mrow></mml:math></alternatives></disp-formula></p>
+    </sec>
+    <sec id="wiener-filtering-nb-1">
+      <title>3. Wiener Filtering</title>
+      <p>Wiener filtering is designed for images affected by additive
+      Gaussian noise and uses local statistical information to perform
+      denoising:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[ \hat{x}(i, j) = \frac{H^*(u,v) S_{xx}(u,v)}{|H(u,v)|^2 S_{xx}(u,v) + S_{nn}(u,v)} ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>x</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mrow><mml:msup><mml:mi>H</mml:mi><mml:mo>*</mml:mo></mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow><mml:mrow><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mi>H</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>n</mml:mi><mml:mi>n</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:mfrac></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>where: - <disp-formula><alternatives>
+      <tex-math><![CDATA[H(u, v)]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>H</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula>
+      is the degradation function, - <disp-formula><alternatives>
+      <tex-math><![CDATA[S_{xx}(u,v)]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula>
+      and <disp-formula><alternatives>
+      <tex-math><![CDATA[S_{nn}(u,v)]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>n</mml:mi><mml:mi>n</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>u</mml:mi><mml:mo>,</mml:mo><mml:mi>v</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula>
+      are the power spectra of the original signal and noise,
+      respectively.</p>
+      <p>The Wiener filter is derived under the assumption that the
+      signal <inline-formula><alternatives>
+      <tex-math><![CDATA[x]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math></alternatives></inline-formula>
+      and noise <inline-formula><alternatives>
+      <tex-math><![CDATA[n]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>n</mml:mi></mml:math></alternatives></inline-formula>
+      are uncorrelated, and both are stationary stochastic processes.
+      Given this, the Wiener filter is designed to minimize the MSE
+      between the true signal and the estimate by accounting for the
+      signal’s and noise’s power spectral densities (PSDs).</p>
+      <p>The Wiener filter minimizes the MSE by balancing the
+      contribution of the noisy data and the signal’s inherent
+      structure. It effectively applies more filtering where the noise
+      dominates (i.e., where <inline-formula><alternatives>
+      <tex-math><![CDATA[S_{nn}(\omega)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>n</mml:mi><mml:mi>n</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is large) and less filtering where the signal is stronger (i.e.,
+      where <inline-formula><alternatives>
+      <tex-math><![CDATA[S_{xx}(\omega)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is large).</p>
+      <boxed-text>
+        <disp-quote>
+          <p><bold>Intuition</bold></p>
+          <p>In simple terms, the Wiener filter achieves the optimal
+          balance between noise suppression and signal preservation by
+          minimizing the MSE. It effectively chooses a trade-off between
+          removing as much noise as possible while still preserving the
+          signal’s details. This is why the Wiener filter can be said to
+          minimize the cost function,</p>
+          <p><disp-formula><alternatives>
+          <tex-math><![CDATA[\Phi_\lambda(y)=\mathbb{E}\left(||y-x||^2\right)]]></tex-math>
+          <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>Φ</mml:mi><mml:mi>λ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mi>𝔼</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mi>y</mml:mi><mml:mo>−</mml:mo><mml:mi>x</mml:mi><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+          <p>By solving this minimization problem using calculus of
+          variations, we arrive at the Wiener filter formula,</p>
+          <p><disp-formula><alternatives>
+          <tex-math><![CDATA[H(\omega)=\frac{S_{xx}(\omega)}{S_{xx}(\omega)+S_{nn}(\omega)}]]></tex-math>
+          <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>H</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow><mml:mrow><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:msub><mml:mi>S</mml:mi><mml:mrow><mml:mi>n</mml:mi><mml:mi>n</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:mfrac></mml:mrow></mml:math></alternatives></disp-formula></p>
+        </disp-quote>
+      </boxed-text>
+    </sec>
+  </sec>
+  <sec id="sec-denoising-nb-1">
+    <title>Python Implementation for Additive Noise and
+    Denoising</title>
+    <p>Below is a <monospace>Python</monospace> code example using
+    <monospace>OpenCV</monospace> and <monospace>Scipy</monospace> to
+    apply denoising algorithms on the famous ‘Lena’ image.</p>
+    <sec id="c1f7b711-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+from PIL import Image
+import urllib.request
+urllib.request.urlretrieve('http://lenna.org/len_top.jpg',&quot;input.jpg&quot;)
+img1 = Image.open(&quot;input.jpg&quot;) #loading first image
+arr1 = np.array(img1)</preformat>
+    </sec>
+    <sec id="cell-2b72a9e6-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Adding Gaussian noise with a lower sigma (e.g., sigma=10 for less noise)
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Display noisy image
+plt.figure(figsize=(8, 5))
+plt.imshow(noisy_lena, cmap='gray')
+plt.title('Noisy Lena Image (Gaussian Noise, sigma=10)')
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-3-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-6c593aad-nb-1" specific-use="notebook-content">
+    <list list-type="order">
+      <list-item>
+        <p>Gaussian Smoothing in Python Gaussian smoothing can be
+        applied using the following code:</p>
+      </list-item>
+    </list>
+    </sec>
+    <sec id="a88284a9-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+# Apply Gaussian smoothing
+smoothed_lena = cv2.GaussianBlur(noisy_lena, (5, 5), sigmaX=1)
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.title(&quot;Denoised Image (Gaussian Smoothing)&quot;)
+plt.imshow(smoothed_lena, cmap='gray')
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-4-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-87b5478c-nb-1" specific-use="notebook-content">
+    <list list-type="order">
+      <list-item>
+        <label>2.</label>
+        <p>Median Filtering in Python</p>
+      </list-item>
+    </list>
+    <p>To apply median filtering:</p>
+    </sec>
+    <sec id="cell-43b64d88-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+# Apply Median filtering
+median_lena = cv2.medianBlur(noisy_lena, 5)
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.title(&quot;Denoised Image (Median Filtering)&quot;)
+plt.imshow(median_lena, cmap='gray')
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-5-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="c0b46afa-nb-1" specific-use="notebook-content">
+    <list list-type="order">
+      <list-item>
+        <label>3.</label>
+        <p>Non-Local means denoising</p>
+      </list-item>
+    </list>
+    </sec>
+    <sec id="cell-347bdb9d-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+# Apply Non-Local Means denoising (cv2.fastNlMeansDenoising for grayscale)
+nlmeans_denoised_lena = cv2.fastNlMeansDenoising(noisy_lena, h=10, templateWindowSize=7, searchWindowSize=21)
+
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(nlmeans_denoised_lena, cmap='gray')
+plt.title('Non-Local Means Denoising')
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-6-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-32be62a0-nb-1" specific-use="notebook-content">
+    <list list-type="order">
+      <list-item>
+        <label>4.</label>
+        <p>Bilateral filtering</p>
+      </list-item>
+    </list>
+    </sec>
+    <sec id="e5fcbaa6-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+# Apply Bilateral Filter
+bilateral_denoised = cv2.bilateralFilter(noisy_lena, d=9, sigmaColor=75, sigmaSpace=75)
+
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(bilateral_denoised, cmap='gray')
+plt.title('Bilateral Filtering')
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-7-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="ebb21859-nb-1" specific-use="notebook-content">
+    <list list-type="order">
+      <list-item>
+        <label>3.</label>
+        <p>Weinner denoiser</p>
+      </list-item>
+    </list>
+    </sec>
+    <sec id="f807a2d7-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+from scipy.signal import wiener
+
+# Apply Wiener Filtering
+denoised_image = wiener(noisy_lena)
+# Display the result
+plt.figure(figsize=(8, 5))
+plt.imshow(denoised_image, cmap='gray')
+plt.title('Weinner denoiser')
+plt.tight_layout()
+plt.show()</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-8-output-1.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-78b3e46e-nb-1" specific-use="notebook-content">
+    <boxed-text>
+      <disp-quote>
+        <p><bold>Reason for worst denoising effect</bold></p>
+        <p>In this case, adding Gaussian noise makes the noise
+        stationary, but if the underlying image is non-stationary (as
+        most images are), the Wiener filter may struggle to achieve
+        optimal results. It treats all areas of the image uniformly,
+        without taking into account the local variations (edges,
+        textures), which leads to suboptimal denoising.</p>
+      </disp-quote>
+    </boxed-text>
+    <p>To improve the performance of denoising in such cases, advanced
+    techniques (e.g., BM3D, non-local means) that adapt to local
+    variations in the image are generally more effective.</p>
+    <p>From these illustrations, let’s go for the simplest case but
+    reasonably fit to our learning needs- the Gaussian smoothing. As an
+    experiment to optimize the image denoising with optimal paramters,
+    an iterative approach is used as shown below. Here the adopted
+    procedure is:</p>
+    <p><italic>Define a Metric for Error:</italic> Calculate the error
+    between the denoised image and the original image. Common metrics
+    include Mean Squared Error (MSE) and Peak Signal-to-Noise Ratio
+    (PSNR).</p>
+    <p><italic>Vary Parameters:</italic> Experiment with different
+    values for the kernel size and sigmaX to see which combination
+    provides the best performance.</p>
+    <p><italic>Evaluate and Choose the Best Parameters:</italic> Use the
+    defined error metric to compare different parameter settings and
+    select the ones with the lowest error.</p>
+    </sec>
+    <sec id="cell-5447946a-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute MSE
+def compute_mse(original, denoised):
+    return mean_squared_error(original.flatten(), denoised.flatten())
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create noisy image
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_mse = float('inf')
+best_params = (None, None)
+best_denoised_image = None
+
+# Prepare subplots
+fig, axes = plt.subplots(len(kernel_sizes), len(sigmaXs), figsize=(8, 5))
+fig.suptitle('Denoised Images for Different Parameters', fontsize=16)
+
+for i, ksize in enumerate(kernel_sizes):
+    for j, sigmaX in enumerate(sigmaXs):
+        # Apply Gaussian smoothing
+        smoothed_lena = apply_gaussian_smoothing(noisy_lena, ksize, sigmaX)
+        
+        # Compute MSE
+        mse = compute_mse(lena, smoothed_lena)
+        
+        # Update best parameters if this is the best MSE
+        if mse &lt; best_mse:
+            best_mse = mse
+            best_params = (ksize, sigmaX)
+            best_denoised_image = smoothed_lena
+        
+        # Display the image in subplot
+        ax = axes[i, j]
+        ax.imshow(smoothed_lena, cmap='gray')
+        ax.set_title(f'K={ksize}, S={sigmaX}')
+        ax.axis('off')
+
+# Display the best denoised image
+plt.figure()
+plt.title(&quot;Best Denoised Image (Gaussian Smoothing)&quot;)
+plt.imshow(best_denoised_image, cmap='gray')
+plt.tight_layout()
+plt.show()
+print(f&quot;Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}&quot;)
+print(f&quot;Best MSE: {best_mse}&quot;)</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-9-output-1.png" />
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-9-output-2.png" />
+    </boxed-text>
+    <boxed-text>
+      <preformat>Best parameters: Kernel Size = 7, SigmaX = 1
+Best MSE: 31.192422222222223</preformat>
+    </boxed-text>
+    </sec>
+    <sec id="cell-2b47c818-nb-1" specific-use="notebook-content">
+    <p>Mean Square Error is a common but imperfect measure of image
+    quality. MSE focuses on pixel-wise differences, which may not
+    correlate well with perceptual image quality. An image can have low
+    MSE but still appear blurry or lack important details. Newer
+    algorithms often aim to balance MSE minimization with other
+    perceptually relevant metrics, leading to better subjective image
+    quality even if the MSE is slightly higher.</p>
+    <p>Peak signal-to-noise ratio (PSNR) is an engineering term for the
+    ratio between the maximum possible power of a signal and the power
+    of corrupting noise that affects the fidelity of its representation.
+    It is a common metric used to assess the quality of the denoised
+    image defined as:</p>
+    <p><disp-formula><alternatives>
+    <tex-math><![CDATA[ \text{PSNR}=10\log_{10}\left(\frac{\text{Max}_i^2}{\text{MSE}}\right)]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mtext mathvariant="normal">PSNR</mml:mtext><mml:mo>=</mml:mo><mml:mn>10</mml:mn><mml:msub><mml:mo>log</mml:mo><mml:mn>10</mml:mn></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mfrac><mml:msubsup><mml:mtext mathvariant="normal">Max</mml:mtext><mml:mi>i</mml:mi><mml:mn>2</mml:mn></mml:msubsup><mml:mtext mathvariant="normal">MSE</mml:mtext></mml:mfrac><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>where <inline-formula><alternatives>
+    <tex-math><![CDATA[\text{MAX}_i]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mtext mathvariant="normal">MAX</mml:mtext><mml:mi>i</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+    is the maximum possible pixel value of the image, and MSE is the
+    mean squared error between the ground truth and the denoised image.
+    A <monospace>Python</monospace> implementation that replaces MSE
+    with PSNR is shown below.</p>
+    </sec>
+    <sec id="cell-6807e382-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = mean_squared_error(original.flatten(), denoised.flatten())
+    if mse == 0:
+        return 100  # Perfect match
+    max_pixel = 255.0
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create noisy image
+noisy_lena = add_gaussian_noise(lena, sigma=10)
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_psnr = -float('inf')
+best_params = (None, None)
+best_denoised_image = None
+
+# Prepare subplots
+fig, axes = plt.subplots(len(kernel_sizes), len(sigmaXs), figsize=(8, 5))
+fig.suptitle('Denoised Images for Different Parameters', fontsize=16)
+
+for i, ksize in enumerate(kernel_sizes):
+    for j, sigmaX in enumerate(sigmaXs):
+        # Apply Gaussian smoothing
+        smoothed_lena = apply_gaussian_smoothing(noisy_lena, ksize, sigmaX)
+        
+        # Compute PSNR
+        psnr = compute_psnr(lena, smoothed_lena)
+        
+        # Update best parameters if this is the best PSNR
+        if psnr &gt; best_psnr:
+            best_psnr = psnr
+            best_params = (ksize, sigmaX)
+            best_denoised_image = smoothed_lena
+        
+        # Display the image in subplot
+        ax = axes[i, j]
+        ax.imshow(smoothed_lena, cmap='gray')
+        ax.set_title(f'K={ksize}, S={sigmaX}')
+        ax.axis('off')
+
+# Display the best denoised image
+plt.figure()
+plt.title(&quot;Best Denoised Image (Gaussian Smoothing)&quot;)
+plt.imshow(best_denoised_image, cmap='gray')
+plt.tight_layout()
+plt.show()
+
+print(f&quot;Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}&quot;)
+print(f&quot;Best PSNR: {best_psnr} dB&quot;)</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-10-output-1.png" />
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-10-output-2.png" />
+    </boxed-text>
+    <boxed-text>
+      <preformat>Best parameters: Kernel Size = 3, SigmaX = 1
+Best PSNR: 33.21439034072804 dB</preformat>
+    </boxed-text>
+    </sec>
+    <sec id="cell-2320924a-nb-1" specific-use="notebook-content">
+    <p>In this experiment, both the approaches produced the same
+    result!</p>
+    <p>Next we consider a more general situation. Suppose 20 noisy
+    images of the same clean image are avaiable. Need to denoise all the
+    images at the best level. There are two approaches for this
+    situation.</p>
+    <list list-type="order">
+      <list-item>
+        <p>Apply denoising algorithm with varying parameters on all 20
+        noisy images, and identify the best parameters using MSE or PSNR
+        metric. Finally use these best parameters on all noised images
+        to denoise to the optimum.</p>
+      </list-item>
+      <list-item>
+        <p>Use a same approach in the first part. But instead of using
+        the best parameters, use the parameters of the <italic>most
+        likely</italic> MSE or PSNR measure for final denoising.</p>
+      </list-item>
+    </list>
+    <p>Python implementation of the second approach is given below.</p>
+    </sec>
+    <sec id="fbade77f-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Load the Lena image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = mean_squared_error(original.flatten(), denoised.flatten())
+    if mse == 0:
+        return 100  # Perfect match
+    max_pixel = 255.0
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Create 20 noisy images
+num_noisy_images = 20
+noisy_images = [add_gaussian_noise(lena, sigma=10) for _ in range(num_noisy_images)]
+
+# Define parameter ranges
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Variables to keep track of best parameters
+best_psnr = -float('inf')
+best_params = (None, None)
+
+# Evaluate parameters on the dataset
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        psnr_total = 0
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = apply_gaussian_smoothing(noisy_img, ksize, sigmaX)
+            
+            # Compute PSNR
+            psnr = compute_psnr(lena, smoothed_img)
+            psnr_total += psnr
+        
+        # Average PSNR for this parameter set
+        avg_psnr = psnr_total / num_noisy_images
+        
+        # Update best parameters if this is the best PSNR
+        if avg_psnr &gt; best_psnr:
+            best_psnr = avg_psnr
+            best_params = (ksize, sigmaX)
+
+print(f&quot;Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}&quot;)
+print(f&quot;Best Average PSNR: {best_psnr} dB&quot;)
+
+# Prepare subplots
+rows = 4
+cols = 5
+fig, axes = plt.subplots(rows, cols, figsize=(8, 5))
+
+# Flatten axes array for easy indexing
+axes = axes.flatten()
+
+# Apply optimal parameters to noisy images and display
+for i, noisy_img in enumerate(noisy_images):
+    # Apply Gaussian smoothing with optimal parameters
+    denoised_img = apply_gaussian_smoothing(noisy_img, best_params[0], best_params[1])
+    
+    # Display the denoised image in subplot
+    ax = axes[i]
+    ax.imshow(denoised_img, cmap='gray')
+    ax.set_title(f&quot;Image {i+1}&quot;)
+    ax.axis('off')
+
+# Hide any unused subplots
+for j in range(num_noisy_images, rows * cols):
+    axes[j].axis('off')
+
+# Adjust layout and display the plot
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()</preformat>
+    <boxed-text>
+      <preformat>Best parameters: Kernel Size = 5, SigmaX = 1
+Best Average PSNR: 33.208635749724365 dB</preformat>
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-11-output-2.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-67972ea2-nb-1" specific-use="notebook-content">
+  </sec>
+  <sec id="landing-to-the-background-of-the-article-nb-1">
+    <title>Landing to the background of the article</title>
+    <p>Is it possible to create a high-quality denoised image from a set
+    of noisy images, even if we don’t have the clean reference
+    image?</p>
+    <p>Sure. This classical technique is commonly referred to as image
+    denoising through <italic>ensemble methods</italic> or <italic>image
+    fusion</italic>. The idea is to leverage the fact that each noisy
+    image contains some useful information, and by combining these
+    images effectively, one can obtain a better denoised result. This
+    seems to be more realistic in application view point.</p>
+    </sec>
+    <sec id="cell-541d48e5-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute Mean Squared Error (MSE) between two images
+def compute_mse(image1, image2):
+    return mean_squared_error(image1.flatten(), image2.flatten())
+
+# Load the clean image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Number of noisy images to generate
+num_noisy_images = 20
+sigma = 10  # Standard deviation for Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(lena, sigma) for _ in range(num_noisy_images)]
+
+# Define parameter ranges for denoising
+kernel_sizes = [3, 5, 7, 9]
+sigmaXs = [0.5, 1, 1.5, 2]
+
+# Variables to keep track of best parameters
+best_mse = float('inf')
+best_params = (None, None)
+best_denoised_images = []
+
+# Perform denoising for different parameters
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        denoised_images = []
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = cv2.GaussianBlur(noisy_img, (ksize, ksize), sigmaX=sigmaX)
+            denoised_images.append(smoothed_img)
+        
+        # Convert list to numpy array for easy manipulation
+        denoised_images = np.array(denoised_images)
+
+        # Compute the average of all denoised images
+        average_denoised_image = np.mean(denoised_images, axis=0)
+        average_denoised_image = np.clip(average_denoised_image, 0, 255).astype(np.uint8)
+
+        # Compute the mean squared error (MSE) between all pairs of denoised images
+        mse_total = 0
+        count = 0
+        for i in range(len(denoised_images)):
+            for j in range(i + 1, len(denoised_images)):
+                mse_total += compute_mse(denoised_images[i], denoised_images[j])
+                count += 1
+        
+        # Average MSE
+        mse_avg = mse_total / count if count &gt; 0 else float('inf')
+
+        # Update best parameters if this is the best MSE
+        if mse_avg &lt; best_mse:
+            best_mse = mse_avg
+            best_params = (ksize, sigmaX)
+            best_denoised_images = denoised_images
+
+# Compute the average image from the best denoised images
+average_best_denoised_image = np.mean(best_denoised_images, axis=0)
+average_best_denoised_image = np.clip(average_best_denoised_image, 0, 255).astype(np.uint8)
+
+# Display the averaged denoised images
+fig, axes = plt.subplots(4, 5, figsize=(8, 5))
+for i in range(4):
+    for j in range(5):
+        idx = i * 5 + j
+        if idx &lt; len(noisy_images):
+            axes[i, j].imshow(noisy_images[idx], cmap='gray')
+            axes[i, j].set_title(f'Noisy Image {idx+1}')
+            axes[i, j].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(average_best_denoised_image, cmap='gray')
+plt.title(f&quot;Best Averaged Denoised Image\nBest Parameters: K={best_params[0]}, S={best_params[1]}&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+
+# Print best parameters and MSE
+print(f&quot;Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}&quot;)
+print(f&quot;Best Average MSE: {best_mse}&quot;)</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-12-output-1.png" />
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-12-output-2.png" />
+    </boxed-text>
+    <boxed-text>
+      <preformat>Best parameters: Kernel Size = 9, SigmaX = 2
+Best Average MSE: 4.567790467836257</preformat>
+    </boxed-text>
+    </sec>
+    <sec id="ab98e479-nb-1" specific-use="notebook-content">
+    <p>Instead of MSE, the PSNR metric can be used. Here the comparison
+    is with another <italic>noisy image</italic>.</p>
+    </sec>
+    <sec id="a24f7234-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Function to calculate PSNR
+def calculate_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')  # PSNR is infinite for identical images
+    max_pixel = 255.0
+    psnr = 10 * np.log10((max_pixel ** 2) / mse)
+    return psnr
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Load the clean image
+lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Number of noisy images to generate
+num_noisy_images = 20
+sigma = 10  # Standard deviation for Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(lena, sigma) for _ in range(num_noisy_images)]
+
+# Define parameter ranges for denoising
+kernel_sizes = [3, 5, 7, 9]
+sigmaXs = [0.5, 1, 1.5, 2]
+
+# Variables to keep track of best parameters
+best_psnr = float('-inf')
+best_params = (None, None)
+best_denoised_images = []
+
+# Perform denoising for different parameters
+for ksize in kernel_sizes:
+    for sigmaX in sigmaXs:
+        denoised_images = []
+        for noisy_img in noisy_images:
+            # Apply Gaussian smoothing
+            smoothed_img = cv2.GaussianBlur(noisy_img, (ksize, ksize), sigmaX=sigmaX)
+            denoised_images.append(smoothed_img)
+        
+        # Convert list to numpy array for easy manipulation
+        denoised_images = np.array(denoised_images)
+
+        # Compute the average of all denoised images
+        average_denoised_image = np.mean(denoised_images, axis=0)
+        average_denoised_image = np.clip(average_denoised_image, 0, 255).astype(np.uint8)
+
+        # Compute the average PSNR between all pairs of denoised images
+        psnr_total = 0
+        count = 0
+        for i in range(len(denoised_images)):
+            for j in range(i + 1, len(denoised_images)):
+                psnr_total += calculate_psnr(denoised_images[i], denoised_images[j])
+                count += 1
+        
+        # Average PSNR
+        psnr_avg = psnr_total / count if count &gt; 0 else float('-inf')
+
+        # Update best parameters if this is the best PSNR
+        if psnr_avg &gt; best_psnr:
+            best_psnr = psnr_avg
+            best_params = (ksize, sigmaX)
+            best_denoised_images = denoised_images
+
+# Compute the average image from the best denoised images
+average_best_denoised_image = np.mean(best_denoised_images, axis=0)
+average_best_denoised_image = np.clip(average_best_denoised_image, 0, 255).astype(np.uint8)
+
+# Display the averaged denoised images
+fig, axes = plt.subplots(4, 5, figsize=(8, 5))
+for i in range(4):
+    for j in range(5):
+        idx = i * 5 + j
+        if idx &lt; len(noisy_images):
+            axes[i, j].imshow(noisy_images[idx], cmap='gray')
+            axes[i, j].set_title(f'Noisy Image {idx+1}')
+            axes[i, j].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(average_best_denoised_image, cmap='gray')
+plt.title(f&quot;Best Averaged Denoised Image\nBest Parameters: K={best_params[0]}, S={best_params[1]}&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+
+# Print best parameters and PSNR
+print(f&quot;Best parameters: Kernel Size = {best_params[0]}, SigmaX = {best_params[1]}&quot;)
+print(f&quot;Best Average PSNR: {best_psnr}&quot;)</preformat>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-13-output-1.png" />
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-13-output-2.png" />
+    </boxed-text>
+    <boxed-text>
+      <preformat>Best parameters: Kernel Size = 9, SigmaX = 2
+Best Average PSNR: 41.49546207545788</preformat>
+    </boxed-text>
+    </sec>
+    <sec id="cell-4b43e0b9-nb-1" specific-use="notebook-content">
+    <p>In this article, authors refer that, in the context of image
+    denoising with Gaussian noise, <italic>Generalized Cross Validation
+    (GCV)</italic> and **Stein’s Unbiased Risk Estimate (SURE)* are used
+    to estimate the performance of denoising algorithms without
+    requiring a clean reference image. A review of these topics from
+    fundamentals of image processing provides following key
+    insights.</p>
+    <sec id="generalized-cross-validation-gcv-nb-1">
+      <title>Generalized Cross Validation (GCV)</title>
+      <p>Generalized Cross Validation is a technique used to estimate
+      the optimal parameters of a model by minimizing an estimate of the
+      prediction error. In image denoising, GCV helps in selecting the
+      best parameters for a denoising algorithm without needing a clean
+      reference image.</p>
+      <p>Steps in using GCV are:</p>
+      <list list-type="order">
+        <list-item>
+          <p><italic>Model and Data</italic>: Apply a denoising
+          algorithm with different parameter settings to the noisy
+          image.</p>
+        </list-item>
+        <list-item>
+          <p><italic>Estimate Residuals</italic>: For each parameter
+          setting, compute an estimate of the residual error. This
+          involves calculating how well the model predicts the noisy
+          image based on the parameters.</p>
+        </list-item>
+        <list-item>
+          <p><italic>Optimize Parameters</italic>: Choose the parameters
+          that minimize the generalized cross-validation criterion,
+          which is an estimate of the prediction error.</p>
+        </list-item>
+      </list>
+      <p><bold>Mathematical Formulation:</bold></p>
+      <p>For Gaussian noise, GCV often involves minimizing the following
+      criterion:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      \text{GCV}(\lambda) = \frac{1}{n} \sum_{i=1}^n \frac{(y_i - \hat{y}_i)^2}{(1 - h_i)^2}
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mtext mathvariant="normal">GCV</mml:mtext><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>λ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mi>n</mml:mi></mml:mfrac><mml:munderover><mml:mo>∑</mml:mo><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mi>n</mml:mi></mml:munderover><mml:mfrac><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>y</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mover><mml:mi>y</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mi>i</mml:mi></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>1</mml:mn><mml:mo>−</mml:mo><mml:msub><mml:mi>h</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup></mml:mfrac></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>where: - <inline-formula><alternatives>
+      <tex-math><![CDATA[y_i]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>y</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+      is the observed noisy value. - <inline-formula><alternatives>
+      <tex-math><![CDATA[\hat{y}_i]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mover><mml:mi>y</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mi>i</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+      is the estimated value from the denoising model. -
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[h_i]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>h</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+      is the leverage or influence of the <inline-formula><alternatives>
+      <tex-math><![CDATA[i]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>i</mml:mi></mml:math></alternatives></inline-formula>-th
+      observation.</p>
+    </sec>
+    <sec id="steins-unbiased-risk-estimate-sure-nb-1">
+      <title>Stein’s Unbiased Risk Estimate (SURE)</title>
+      <p>Stein’s Unbiased Risk Estimate provides an estimate of the mean
+      squared error (MSE) of an estimator without needing the true clean
+      image. It is particularly useful for choosing regularization
+      parameters in denoising problems.</p>
+      <p>Key steps:</p>
+      <list list-type="order">
+        <list-item>
+          <p><italic>Estimate the Risk</italic>: Compute Stein’s
+          unbiased risk estimate based on the noisy image and the
+          denoised estimate.</p>
+        </list-item>
+        <list-item>
+          <p><italic>Optimize Parameters</italic>: Select the parameters
+          that minimize the SURE estimate.</p>
+        </list-item>
+      </list>
+      <p><bold>Mathematical Formulation:</bold></p>
+      <p>SURE for Gaussian noise can be expressed as:</p>
+      <p><disp-formula><alternatives>
+      <tex-math><![CDATA[
+      \text{SURE}(\hat{f}) = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{f}(x_i))^2 + 2 \sigma^2 \text{trace}(I - H)
+      ]]></tex-math>
+      <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mtext mathvariant="normal">SURE</mml:mtext><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mover><mml:mi>f</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mi>n</mml:mi></mml:mfrac><mml:munderover><mml:mo>∑</mml:mo><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mi>n</mml:mi></mml:munderover><mml:msup><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>y</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:mover><mml:mi>f</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:mo>+</mml:mo><mml:mn>2</mml:mn><mml:msup><mml:mi>σ</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mtext mathvariant="normal">trace</mml:mtext><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>I</mml:mi><mml:mo>−</mml:mo><mml:mi>H</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+      <p>where: - <inline-formula><alternatives>
+      <tex-math><![CDATA[y_i]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>y</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+      is the noisy observation. - <inline-formula><alternatives>
+      <tex-math><![CDATA[\hat{f}(x_i)]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>f</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></inline-formula>
+      is the estimate from the denoising algorithm. -
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[\sigma^2]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msup><mml:mi>σ</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:math></alternatives></inline-formula>
+      is the noise variance. - <inline-formula><alternatives>
+      <tex-math><![CDATA[H]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>H</mml:mi></mml:math></alternatives></inline-formula>
+      is the hat matrix or influence matrix.</p>
+      <boxed-text>
+        <disp-quote>
+          <p><bold>Note</bold></p>
+          <list list-type="bullet">
+            <list-item>
+              <p><italic>Generalized Cross Validation (GCV)</italic> and
+              <italic>Stein’s Unbiased Risk Estimate (SURE)</italic> are
+              statistical methods used for parameter selection in
+              denoising algorithms without needing a clean reference
+              image.</p>
+            </list-item>
+            <list-item>
+              <p><italic>GCV</italic> involves minimizing an estimate of
+              the prediction error.</p>
+            </list-item>
+            <list-item>
+              <p><italic>SURE</italic> provides an unbiased estimate of
+              the mean squared error for a given denoised image.</p>
+            </list-item>
+          </list>
+          <p>Both methods help in optimizing denoising parameters
+          effectively in the absence of a clean image by leveraging
+          statistical properties of Gaussian noise.</p>
+        </disp-quote>
+      </boxed-text>
+      <p>As in the previous examples, it is clear that the MSE is not a
+      good measure for assessing quality of a denoised image and PSNR is
+      more on perception side. So, experimenting the GCV and SURE is a
+      good option.</p>
+      <p>Python implementation of <italic>GCV</italic> is given
+      below.</p>
+      </sec>
+      <sec id="a66a128e-nb-1" specific-use="notebook-content">
+      <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute Generalized Cross Validation (GCV)
+def generalized_cross_validation(noisy_images, denoised_images, parameters):
+    best_gcv = float('inf')
+    best_denoised_image = None
+    best_params = None
+
+    for i, denoised_image in enumerate(denoised_images):
+        residuals = [noisy - denoised_image for noisy in noisy_images]
+        
+        # Calculate a simplified leverage matrix
+        h = np.ones_like(noisy_images[0]) * 0.01  # Small constant to prevent division by zero
+        
+        # Compute GCV criterion for each noisy image
+        gcv_values = []
+        for residual in residuals:
+            gcv = np.mean((residual ** 2) / (1 - h) ** 2)
+            gcv_values.append(gcv)
+        
+        average_gcv = np.mean(gcv_values)
+        
+        if average_gcv &lt; best_gcv:
+            best_gcv = average_gcv
+            best_denoised_image = denoised_image
+            best_params = parameters[i]
+    
+    return best_denoised_image, best_params
+
+# Parameters
+sigma_values = [10]  # Gaussian noise standard deviation
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Generate multiple noisy images
+num_noisy_images = 10  # Ensure a sufficient number of noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma=sigma_values[0]) for _ in range(num_noisy_images)]
+
+# Apply Gaussian smoothing with different parameters
+denoised_images = []
+parameters = []
+for noisy_image in noisy_images:
+    for ksize in kernel_sizes:
+        for sigmaX in sigmaXs:
+            denoised_image = apply_gaussian_smoothing(noisy_image, ksize, sigmaX)
+            denoised_images.append(denoised_image)
+            parameters.append((ksize, sigmaX))
+
+# Check if there are enough noisy images to split
+if len(noisy_images) &gt; 1:
+    # Split the noisy images into training and validation sets
+    train_noisy, val_noisy = train_test_split(noisy_images, test_size=0.5, random_state=42)
+
+    # Apply GCV to find the best denoised image
+    best_denoised_image, best_params = generalized_cross_validation(train_noisy, denoised_images, parameters)
+else:
+    print(&quot;Not enough noisy images to perform training and validation split.&quot;)
+    best_denoised_image = denoised_images[0]  # Default to the first denoised image if not enough data
+    best_params = parameters[0]  # Default to the first parameters if not enough data
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f&quot;Best Denoised Image (GCV)\nK={best_params[0]}, S={best_params[1]}&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+      <boxed-text>
+        <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-14-output-1.png" />
+      </boxed-text>
+      </sec>
+      <sec id="cell-7a3a134b-nb-1" specific-use="notebook-content">
+      <p>Python implementation of SURE approach is shown below.</p>
+      </sec>
+      <sec id="cell-0b7c65db-nb-1" specific-use="notebook-content">
+      <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute Stein’s Unbiased Risk Estimate (SURE)
+def steins_unbiased_risk_estimate(noisy_image, denoised_image, sigma):
+    # Compute residuals
+    residuals = noisy_image - denoised_image
+    
+    # Estimate the risk
+    n = noisy_image.size
+    sure = np.mean(residuals ** 2) + 2 * sigma ** 2 * np.mean(np.abs(residuals))
+    
+    return sure
+
+# Parameters
+sigma_values = [10]  # Gaussian noise standard deviation
+kernel_sizes = [3, 5, 7, 9]  # Example kernel sizes
+sigmaXs = [0.5, 1, 1.5, 2]   # Example sigmaX values
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Apply Gaussian smoothing with different parameters
+denoised_images = []
+for noisy_image in noisy_images:
+    for ksize in kernel_sizes:
+        for sigmaX in sigmaXs:
+            denoised_image = apply_gaussian_smoothing(noisy_image, ksize, sigmaX)
+            denoised_images.append((denoised_image, ksize, sigmaX))
+
+# Find the best denoised image using SURE
+best_sure = float('inf')
+best_denoised_image = None
+best_params = (None, None)
+
+for denoised_image, ksize, sigmaX in denoised_images:
+    sure = steins_unbiased_risk_estimate(noisy_image, denoised_image, sigma=10)
+    
+    if sure &lt; best_sure:
+        best_sure = sure
+        best_denoised_image = denoised_image
+        best_params = (ksize, sigmaX)
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f&quot;Best Denoised Image (SURE)\nK={best_params[0]}, S={best_params[1]}&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+      <boxed-text>
+        <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-15-output-1.png" />
+      </boxed-text>
+      </sec>
+      <sec id="cell-8424bb15-nb-1" specific-use="notebook-content">
+      <p>In this experiment, both the approach come with same
+      parameters!</p>
+      <p>Cross-validation is used to assess how well a model (or in this
+      case, a denoising algorithm with specific parameters
+      <inline-formula><alternatives>
+      <tex-math><![CDATA[k]]></tex-math>
+      <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>k</mml:mi></mml:math></alternatives></inline-formula>
+      and <monospace>sigmaX</monospace>) generalizes to unseen data. For
+      image denoising, it involves splitting the data into training and
+      validation sets to evaluate the performance of different parameter
+      settings.</p>
+      <p>In the context of denoising, we would use noisy images with
+      known parameters to select the best parameters by evaluating how
+      well the denoising algorithm performs on validation images. This
+      process helps in selecting parameters that
+      <italic>generalize</italic> well across different noisy
+      samples.</p>
+      <p>Also <italic>SURE</italic> provides an estimate of the risk (or
+      error) of a denoising algorithm based on the residuals between
+      noisy and denoised images. It helps in selecting parameters that
+      minimize this estimated risk.</p>
+      <p>Now come into the authors’ concept-<italic>… the proposed
+      method i.e., fitting algorithm parameters to a single image,
+      corresponds to the extreme case of one pair of noisy images of a
+      single clean image</italic>. So, training on variable images is
+      not possible. Here the parameter fine tuning in restricted to just
+      a pair of noisy images of a single clean image which in turn not
+      available for reference!</p>
+    </sec>
+  </sec>
+  <sec id="replicating-the-authors-work-with-gradient-descend-nb-1">
+    <title>Replicating the author’s work with gradient descend</title>
+    <p>In the proposed model for <monospace>N2N</monospace> denoiser,
+    authors formulate the objective function as:
+    <disp-formula><alternatives>
+    <tex-math><![CDATA[\mathcal{C}(\theta)=||A_\theta(y)-y'||]]></tex-math>
+    <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>𝒞</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>θ</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>y</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>−</mml:mo><mml:mi>y</mml:mi><mml:mi>′</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">|</mml:mo><mml:mo stretchy="true" form="postfix">|</mml:mo></mml:mrow></mml:mrow></mml:math></alternatives></disp-formula></p>
+    <p>Where <inline-formula><alternatives>
+    <tex-math><![CDATA[A_\theta]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>A</mml:mi><mml:mi>θ</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+    is the denoiser algorithm in N2N model ,
+    <inline-formula><alternatives>
+    <tex-math><![CDATA[y]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>y</mml:mi></mml:math></alternatives></inline-formula>
+    and <inline-formula><alternatives>
+    <tex-math><![CDATA[y']]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>y</mml:mi><mml:mi>′</mml:mi></mml:mrow></mml:math></alternatives></inline-formula>
+    are two noisy images. They minimize this objective function using
+    gradient descent with automatic differentiation and initial value of
+    the parameters <inline-formula><alternatives>
+    <tex-math><![CDATA[\theta]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>,
+    <inline-formula><alternatives>
+    <tex-math><![CDATA[\theta_0]]></tex-math>
+    <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>θ</mml:mi><mml:mn>0</mml:mn></mml:msub></mml:math></alternatives></inline-formula>
+    found by manually tuning the parameters for a single image.</p>
+    <p>To optimize the cost function without using neural networks, we
+    can directly minimize the loss function using optimization
+    techniques (<monospace>minimize</monospace> function from
+    <monospace>scipy</monospace> library). A python implementation of
+    this parameter tuning is given below.</p>
+    </sec>
+    <sec id="af7bec51-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Create noisy images
+sigma = 10
+noisy_image1 = add_gaussian_noise(clean_image, sigma)
+noisy_image2 = add_gaussian_noise(clean_image, sigma)
+## Define the Denoising Function- The quadratic error function
+def apply_gaussian_filter(image, kernel_size, sigma):
+    return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigmaX=sigma)
+
+def cost_function(params, noisy_image1, noisy_image2):
+    kernel_size, sigma = int(params[0]), params[1]
+    denoised_image = apply_gaussian_filter(noisy_image1, kernel_size, sigma)
+    residuals = denoised_image - noisy_image2
+    return np.sum(residuals ** 2)
+## Optimize the Parameters using gradient descend
+# Initial guess for parameters (kernel_size, sigma)
+initial_params = [3, 1.0]
+
+# Perform optimization
+result = minimize(cost_function, initial_params, args=(noisy_image1, noisy_image2),
+                  bounds=[(3, 21), (0.1, 5.0)],  # bounds for kernel size and sigma
+                  method='L-BFGS-B')
+
+# Extract optimized parameters
+optimized_kernel_size, optimized_sigma = result.x
+print(f&quot;Optimized kernel size: {int(optimized_kernel_size)}&quot;)
+print(f&quot;Optimized sigma: {optimized_sigma}&quot;)
+
+# Apply the optimized denoising function
+optimized_denoised_image = apply_gaussian_filter(noisy_image1, int(optimized_kernel_size), optimized_sigma)
+
+##  Display the Results
+# Display the optimized denoised image
+plt.figure(figsize=(8, 5))
+plt.figure()
+plt.imshow(optimized_denoised_image, cmap='gray')
+plt.title(f'Optimized Denoised Image\nKernel Size: {int(optimized_kernel_size)}, Sigma: {optimized_sigma:.2f}')
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+    <boxed-text>
+      <preformat>Optimized kernel size: 3
+Optimized sigma: 1.0</preformat>
+    </boxed-text>
+    <boxed-text>
+      <preformat>&lt;Figure size 768x480 with 0 Axes&gt;</preformat>
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-16-output-3.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-066e0f24-nb-1" specific-use="notebook-content">
+    <p>A from the scratch mathematical implementation of gradient and
+    the gradient descent algorithm is shown below.</p>
+    </sec>
+    <sec id="daba1636-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+from sklearn.metrics import mean_squared_error
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to ensure kernel size is odd and positive
+def valid_kernel_size(kernel_size):
+    if kernel_size &lt; 1:
+        kernel_size = 1
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+    return int(kernel_size)
+
+# Function to apply Gaussian smoothing
+def denoiser(theta, noisy_image):
+    kernel_size = valid_kernel_size(int(theta[0]))  # Ensure the kernel size is an odd integer
+    sigmaX = theta[1]
+    return cv2.GaussianBlur(noisy_image, (kernel_size, kernel_size), sigmaX=sigmaX)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')
+    psnr = 20 * np.log10(255.0 / np.sqrt(mse))
+    return psnr
+
+# Cost function for scipy optimization
+def cost_function(theta, noisy_image1, noisy_image2):
+    denoised_image = denoiser(theta, noisy_image1)
+    return np.mean((denoised_image - noisy_image2) ** 2)
+
+# Manual gradient descent for denoising optimization
+def gradient_descent(noisy_image, noisy_image2, theta, alpha=0.01, iterations=100):
+    for i in range(iterations):
+        # Compute the gradient for each parameter
+        kernel_size, sigmaX = theta
+        kernel_size = valid_kernel_size(kernel_size)
+        
+        # Denoise the image
+        denoised_image = cv2.GaussianBlur(noisy_image, (int(kernel_size), int(kernel_size)), sigmaX)
+
+        # Compute the gradient for both kernel_size and sigmaX
+        grad_kernel = np.sum(2 * (denoised_image - noisy_image2))  # Simplified gradient computation
+        grad_sigma = np.sum(2 * (denoised_image - noisy_image2))   # Simplified gradient computation
+
+        # Update theta using the gradients
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+
+    return theta
+
+# Noisy images
+noisy_image1 = add_gaussian_noise(clean_image, sigma=20)
+noisy_image2 = add_gaussian_noise(clean_image, sigma=20)
+
+# Initial parameters (theta): [kernel_size, sigmaX]
+initial_theta = [5, 1.0]
+
+# Scipy optimizer: Minimize the cost function
+result = minimize(cost_function, initial_theta, args=(noisy_image1, noisy_image2), method='BFGS', options={'disp': True})
+optimized_theta_scipy = result.x
+denoised_image_scipy = denoiser(optimized_theta_scipy, noisy_image1)
+psnr_scipy = compute_psnr(clean_image, denoised_image_scipy)
+
+# Manual gradient descent optimizer
+optimized_theta_sgd = gradient_descent(noisy_image1, noisy_image2, initial_theta.copy())
+denoised_image_sgd = denoiser(optimized_theta_sgd, noisy_image1)
+psnr_sgd = compute_psnr(clean_image, denoised_image_sgd)
+psnr_noisy=compute_psnr(clean_image, noisy_image1)
+# Plot the results
+fig, ax = plt.subplots(1, 4, figsize=(10, 5))
+# Plot 0: Noisy image y
+ax[0].imshow(noisy_image1, cmap='gray')
+ax[0].set_title(f'Noisy image-1, PSNR: {psnr_noisy:.2f} dB')
+ax[0].axis('off')
+
+# Plot 1: Denoised image (scipy optimizer)
+ax[1].imshow(denoised_image_scipy, cmap='gray')
+ax[1].set_title(f'Scipy Optimizer, PSNR: {psnr_scipy:.2f} dB')
+ax[1].axis('off')
+
+# Plot 2: Denoised image (Manual Gradient Descent)
+ax[2].imshow(denoised_image_sgd, cmap='gray')
+ax[2].set_title(f'Manual Gradient Descent, PSNR: {psnr_sgd:.2f} dB')
+ax[2].axis('off')
+
+# Plot 3: Clean image
+ax[3].imshow(clean_image, cmap='gray')
+ax[3].set_title('Clean Image')
+ax[3].axis('off')
+plt.tight_layout()
+# Show the plot
+plt.show()</preformat>
+    <boxed-text>
+      <preformat>Optimization terminated successfully.
+         Current function value: 90.775011
+         Iterations: 0
+         Function evaluations: 3
+         Gradient evaluations: 1</preformat>
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-17-output-2.png" />
+    </boxed-text>
+    </sec>
+    <sec id="ab061022-nb-1" specific-use="notebook-content">
+    <p>An alternative approach is to use the Gradient descent algorithm
+    form <monospace>sklearn</monospace> library.</p>
+    </sec>
+    <sec id="c8cc32d1-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Create noisy images
+sigma = 10
+noisy_image_1 = add_gaussian_noise(clean_image, sigma)
+noisy_image_2 = add_gaussian_noise(clean_image, sigma)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(image, ksize, sigmaX):
+    return cv2.GaussianBlur(image, (ksize, ksize), sigmaX=sigmaX)
+
+# Define a custom loss function (Mean Squared Error between two denoised images)
+def loss_function(ksize, sigmaX, noisy_image_1, noisy_image_2):
+    denoised_image_1 = apply_gaussian_smoothing(noisy_image_1, ksize, sigmaX)
+    denoised_image_2 = apply_gaussian_smoothing(noisy_image_2, ksize, sigmaX)
+    return np.mean((denoised_image_1 - denoised_image_2) ** 2)
+
+# Parameters for optimization
+ksize_range = np.array([3, 5, 7, 9])  # Possible kernel sizes
+sigmaX_range = np.array([0.5, 1, 1.5, 2])  # Possible sigmaX values
+
+# Convert the ksize and sigmaX values into feature vectors for SGD
+X_train = np.array([[k, s] for k in ksize_range for s in sigmaX_range])
+
+# Flatten the noisy images for input
+y_train = []
+for ksize, sigmaX in X_train:
+    loss = loss_function(int(ksize), sigmaX, noisy_image_1, noisy_image_2)
+    y_train.append(loss)
+
+# Training data (input is kernel size and sigmaX, target is the loss value)
+y_train = np.array(y_train)
+
+# Train using SGDRegressor
+sgd = SGDRegressor(max_iter=1000, tol=1e-6)
+sgd.fit(X_train, y_train)
+
+# Predict the optimal kernel size and sigmaX
+optimal_params = sgd.coef_
+
+# Use the optimal parameters to denoise
+optimal_ksize = int(np.clip(optimal_params[0], 3, 9))  # Ensure ksize is odd and within valid range
+optimal_sigmaX = np.clip(optimal_params[1], 0.5, 2)  # Ensure sigmaX is within valid range
+
+# Apply Gaussian smoothing with the optimal parameters
+best_denoised_image = apply_gaussian_smoothing(noisy_image_1, optimal_ksize, optimal_sigmaX)
+
+# Display the best denoised image
+plt.figure(figsize=(8, 5))
+plt.figure()
+plt.imshow(best_denoised_image, cmap='gray')
+plt.title(f&quot;Best Denoised Image\nKsize={optimal_ksize}, SigmaX={optimal_sigmaX}&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+    <boxed-text>
+      <preformat>&lt;Figure size 768x480 with 0 Axes&gt;</preformat>
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-18-output-2.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-4eb10ce8-nb-1" specific-use="notebook-content">
+    <p>This attempt is to Compare the quality of denoising with SG
+    descent method.</p>
+    </sec>
+    <sec id="cell-0d18c760-nb-1" specific-use="notebook-content">
+    <preformat>#| code-overflow: wrap
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_squared_error
+
+# Load the clean image
+clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to compute PSNR
+def compute_psnr(original, denoised):
+    mse = np.mean((original - denoised) ** 2)
+    if mse == 0:
+        return float('inf')
+    psnr = 20 * np.log10(255.0 / np.sqrt(mse))
+    return psnr
+
+# Noisy images
+noisy_image1 = add_gaussian_noise(clean_image, sigma=20)
+noisy_image2 = add_gaussian_noise(clean_image, sigma=20)
+
+# Denoiser function (optimized parameters using sklearn)
+def denoiser(theta, noisy_image):
+    return cv2.GaussianBlur(noisy_image, (int(theta[0]), int(theta[0])), sigmaX=theta[1])
+
+# Cost function
+def cost_function(theta, noisy_image1, noisy_image2):
+    denoised_image = denoiser(theta, noisy_image1)
+    return np.mean((denoised_image - noisy_image2) ** 2)
+
+# Gradient Descent optimization using sklearn
+def optimize_parameters(noisy_image1, noisy_image2, initial_theta):
+    sgd = SGDRegressor(max_iter=1000, tol=1e-3, learning_rate='adaptive')
+    
+    # Reshape theta and noisy_image for fitting
+    noisy_image1_flat = noisy_image1.flatten()
+    noisy_image2_flat = noisy_image2.flatten()
+    
+    X = np.vstack([noisy_image1_flat, noisy_image2_flat]).T
+    y = noisy_image2_flat
+    
+    sgd.fit(X, y)
+    
+    # Optimized parameters (theta)
+    optimized_theta = sgd.coef_
+    
+    return optimized_theta
+
+# Initial theta parameters (manually tuned)
+initial_theta = [5, 1.0]  # Example: Kernel size 5, sigmaX = 1.0
+
+# Optimize the parameters
+optimized_theta = optimize_parameters(noisy_image1, noisy_image2, initial_theta)
+
+# Apply the denoiser with optimized parameters
+denoised_image = denoiser(optimized_theta, noisy_image1)
+
+# Compute PSNR between the clean image and the denoised image
+psnr_value = compute_psnr(clean_image, denoised_image)
+
+# Display the PSNR value
+print(f&quot;PSNR value between the clean image and the denoised image: {psnr_value:.2f} dB&quot;)
+
+# Display the denoised image
+plt.figure(figsize=(8, 5))
+plt.imshow(denoised_image, cmap='gray')
+plt.title(f&quot;Denoised Image (PSNR: {psnr_value:.2f} dB)&quot;)
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+    <boxed-text>
+      <preformat>PSNR value between the clean image and the denoised image: 31.45 dB</preformat>
+    </boxed-text>
+    <boxed-text>
+      <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/cell-19-output-2.png" />
+    </boxed-text>
+    </sec>
+    <sec id="cell-2056cad0-nb-1" specific-use="notebook-content">
+    <p>Instead of using the default optimizer, let’s try the finite
+    difference approach for numerical differentiation. This approach is
+    purely depended on the function values rather than its mathematical
+    definition. So, computationally it will be more dependable. Improved
+    code with fine tuning gradient descent with finite difference is
+    shown below.</p>
+    </sec>
+    <sec id="cell-fig-denoising-plot-nb-1" specific-use="notebook-content">
+    <preformat>#| label: fig-denoising-plot
+#| fig-cap: Example of denoising results.
+#| fig-alt: A visualization of parameter fine tuning.
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+clean_image = cv2.imread('/manuscript-template-vscode-main/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)  # Ensure size is at least 1
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Gradient descent optimizer
+def gradient_descent(noisy_image1, noisy_image2, initial_theta, alpha=0.01, iterations=100):
+    theta = np.array(initial_theta)
+    for _ in range(iterations):
+        grad_kernel, grad_sigma = compute_gradients(noisy_image1, noisy_image2, theta)
+        theta[0] -= alpha * grad_kernel
+        theta[1] -= alpha * grad_sigma
+        theta[0] = valid_kernel_size(theta[0])
+    return theta
+
+# Compute numerical gradients
+def compute_gradients(noisy_image1, noisy_image2, theta):
+    epsilon = 1e-5
+    cost_1 = cost_function([theta[0] + epsilon, theta[1]], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0] - epsilon, theta[1]], noisy_image1, noisy_image2)
+    grad_kernel = (cost_1 - cost_2) / (2 * epsilon)
+    
+    cost_1 = cost_function([theta[0], theta[1] + epsilon], noisy_image1, noisy_image2)
+    cost_2 = cost_function([theta[0], theta[1] - epsilon], noisy_image1, noisy_image2)
+    grad_sigma = (cost_1 - cost_2) / (2 * epsilon)
+    
+    return grad_kernel, grad_sigma
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Using scipy's minimize function
+initial_theta = [15, 1]  # Initial guess for kernel size and sigmaX
+result = minimize(cost_function, initial_theta, args=(noisy_images[0], noisy_images[1]), method='BFGS')
+optimized_theta_scipy = result.x
+optimized_denoised_image_scipy = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_scipy[0]), optimized_theta_scipy[1])
+
+# Using manual gradient descent optimization
+optimized_theta_gd = gradient_descent(noisy_images[0], noisy_images[1], initial_theta, alpha=0.01, iterations=100)
+optimized_denoised_image_gd = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_gd[0]), optimized_theta_gd[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_scipy = compute_psnr(optimized_denoised_image_scipy, clean_image)
+psnr_gd = compute_psnr(optimized_denoised_image_gd, clean_image)
+psnr_noisy=compute_psnr(noisy_images[0], clean_image)
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image-1\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+# Plot denoised image by scipy optimizer
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_scipy, cmap='gray')
+plt.title(f'Scipy Optimizer\nPSNR: {psnr_scipy:.2f}')
+plt.axis('off')
+# Plot denoised image by manual gradient descent
+plt.subplot(2, 2, 3)
+plt.imshow(optimized_denoised_image_gd, cmap='gray')
+plt.title(f'Gradient Descent\nPSNR: {psnr_gd:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+plt.tight_layout()
+plt.show()</preformat>
+    <boxed-text>
+      <fig id="fig-denoising-plot-nb-1">
+        <caption><p>Example of denoising results.</p></caption>
+        <graphic mimetype="image" mime-subtype="png" xlink:href="review_files/figure-jats/fig-denoising-plot-output-1.png" />
+      </fig>
+    </boxed-text>
+    </sec>
+    <sec id="cell-07dcc3c2-nb-1" specific-use="notebook-content">
+    <boxed-text>
+      <disp-quote>
+        <p><bold>A Missing element</bold></p>
+        <p>In all these fine-tuning implementations, we started with a
+        initial <inline-formula><alternatives>
+        <tex-math><![CDATA[\theta]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>,
+        which is neither relevant to the nosy images nor the clean
+        image. So, the accuracy of the estimated parameters may not be
+        realistic. A solution to this drawback in the fine tuning is
+        given in the article. <italic>… For initialization, we use a
+        fixed <inline-formula><alternatives>
+        <tex-math><![CDATA[\theta_0]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>θ</mml:mi><mml:mn>0</mml:mn></mml:msub></mml:math></alternatives></inline-formula>,
+        found by manually tuning <inline-formula><alternatives>
+        <tex-math><![CDATA[\theta]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>θ</mml:mi></mml:math></alternatives></inline-formula>
+        for a single image from the BS400 dataset</italic>.</p>
+      </disp-quote>
+    </boxed-text>
+    </sec>
+  </sec>
+</sec>
+</body>
+
+
+
+<back>
+</back>
+
+
+</sub-article>
+
+</article>
