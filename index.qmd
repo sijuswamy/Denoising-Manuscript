@@ -1,5 +1,5 @@
 ---
-title: Automatic Turning of Denoising Algorithms Parameters Without Ground Truth
+title: A Review of Automatic Turning of Denoising Algorithms Parameters Without Ground Truth
 subtitle: An initial review for literature survey
 author:
   - name: Siju K S
@@ -12,10 +12,11 @@ author:
       - Software
       - Visualization
     affiliations:
-      - School of Artifical Intelligence
+      - School of Artificial Intelligence
       - Amrita Vishwa Vidyapeetham
   - name: Dr. Vipin V.
-    orcid: 0000-0002-7859-8394
+    orcid: 0000-0002-7943-8923
+    email: v_vipin@cb.amrita.edu
     corresponding: false
     roles: [Supervison]
     affiliations:
