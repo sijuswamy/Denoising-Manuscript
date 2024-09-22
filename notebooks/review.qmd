@@ -170,7 +170,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -187,7 +187,7 @@ noisy_lena = add_gaussian_noise(lena, sigma=10)
 # Display noisy image
 plt.figure(figsize=(8, 5))
 plt.imshow(noisy_lena, cmap='gray')
-plt.title('Noisy Lena Image (Gaussian Noise, sigma=10)')
+plt.title('Noisy Image (Gaussian Noise, sigma=10)')
 plt.show()
 ```
 
@@ -289,7 +289,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -371,7 +371,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -460,7 +460,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -573,7 +573,7 @@ def compute_mse(image1, image2):
     return mean_squared_error(image1.flatten(), image2.flatten())
 
 # Load the clean image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Number of noisy images to generate
 num_noisy_images = 20
@@ -681,7 +681,7 @@ def add_gaussian_noise(image, sigma):
     return noisy_image.astype(np.uint8)
 
 # Load the clean image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Number of noisy images to generate
 num_noisy_images = 20
@@ -833,7 +833,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -924,7 +924,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1015,7 +1015,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1078,7 +1078,7 @@ from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1155,7 +1155,7 @@ denoised_image_sgd = denoiser(optimized_theta_sgd, noisy_image1)
 psnr_sgd = compute_psnr(clean_image, denoised_image_sgd)
 psnr_noisy=compute_psnr(clean_image, noisy_image1)
 # Plot the results
-fig, ax = plt.subplots(1, 4, figsize=(10, 5))
+fig, ax = plt.subplots(1, 4, figsize=(12, 8))
 # Plot 0: Noisy image y
 ax[0].imshow(noisy_image1, cmap='gray')
 ax[0].set_title(f'Noisy image-1, PSNR: {psnr_noisy:.2f} dB')
@@ -1191,7 +1191,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1268,7 +1268,7 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):

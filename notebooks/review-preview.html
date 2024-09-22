@@ -342,7 +342,7 @@ Intuition
 <section id="sec-denoising" class="level2">
 <h2 class="anchored" data-anchor-id="sec-denoising">Python Implementation for Additive Noise and Denoising</h2>
 <p>Below is a <code>Python</code> code example using <code>OpenCV</code> and <code>Scipy</code> to apply denoising algorithms on the famous ‘Lena’ image.</p>
-<div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div id="9caa740c" class="cell" data-execution_count="1">
+<div class="cell-container"><div class="cell-decorator"><pre>In [1]:</pre></div><div id="6abded32" class="cell" data-execution_count="1">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 from PIL import Image
@@ -351,14 +351,14 @@ urllib.request.urlretrieve('http://lenna.org/len_top.jpg',"input.jpg")
 img1 = Image.open("input.jpg") #loading first image
 arr1 = np.array(img1)</code></pre>
 </div></div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="33e08b34" class="cell" data-execution_count="2">
+<div class="cell-container"><div class="cell-decorator"><pre>In [2]:</pre></div><div id="b24c3107" class="cell" data-execution_count="2">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -375,22 +375,22 @@ noisy_lena = add_gaussian_noise(lena, sigma=10)
 # Display noisy image
 plt.figure(figsize=(8, 5))
 plt.imshow(noisy_lena, cmap='gray')
-plt.title('Noisy Lena Image (Gaussian Noise, sigma=10)')
+plt.title('Noisy Image (Gaussian Noise, sigma=10)')
 plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="review_files/figure-html/cell-3-output-1.png" width="649" height="396" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="review_files/figure-html/cell-3-output-1.png" width="424" height="431" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="e6cb550b" class="cell markdown">
+<div id="9d437657" class="cell markdown">
 <ol type="1">
 <li>Gaussian Smoothing in Python Gaussian smoothing can be applied using the following code:</li>
 </ol>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [3]:</pre></div><div id="e2be38c0" class="cell" data-execution_count="3">
+<div class="cell-container"><div class="cell-decorator"><pre>In [3]:</pre></div><div id="42cd82b3" class="cell" data-execution_count="3">
 <pre><code>#| code-overflow: wrap
 # Apply Gaussian smoothing
 smoothed_lena = cv2.GaussianBlur(noisy_lena, (5, 5), sigmaX=1)
@@ -403,18 +403,18 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="review_files/figure-html/cell-4-output-1.png" width="649" height="396" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="review_files/figure-html/cell-4-output-1.png" width="424" height="431" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="bfcb9448" class="cell markdown">
+<div id="e9b467e7" class="cell markdown">
 <ol start="2" type="1">
 <li>Median Filtering in Python</li>
 </ol>
 <p>To apply median filtering:</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [4]:</pre></div><div id="e4f07e82" class="cell" data-execution_count="4">
+<div class="cell-container"><div class="cell-decorator"><pre>In [4]:</pre></div><div id="8758077a" class="cell" data-execution_count="4">
 <pre><code>#| code-overflow: wrap
 # Apply Median filtering
 median_lena = cv2.medianBlur(noisy_lena, 5)
@@ -427,17 +427,17 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="review_files/figure-html/cell-5-output-1.png" width="649" height="396" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="review_files/figure-html/cell-5-output-1.png" width="424" height="431" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="4bf75965" class="cell markdown">
+<div id="ce99d1b5" class="cell markdown">
 <ol start="3" type="1">
 <li>Non-Local means denoising</li>
 </ol>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [5]:</pre></div><div id="fce82b07" class="cell" data-execution_count="5">
+<div class="cell-container"><div class="cell-decorator"><pre>In [5]:</pre></div><div id="b51d57d3" class="cell" data-execution_count="5">
 <pre><code>#| code-overflow: wrap
 # Apply Non-Local Means denoising (cv2.fastNlMeansDenoising for grayscale)
 nlmeans_denoised_lena = cv2.fastNlMeansDenoising(noisy_lena, h=10, templateWindowSize=7, searchWindowSize=21)
@@ -450,17 +450,17 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="review_files/figure-html/cell-6-output-1.png" width="649" height="396" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="review_files/figure-html/cell-6-output-1.png" width="424" height="431" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="d927b79b" class="cell markdown">
+<div id="6549a2b3" class="cell markdown">
 <ol start="4" type="1">
 <li>Bilateral filtering</li>
 </ol>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [6]:</pre></div><div id="0ba08289" class="cell" data-execution_count="6">
+<div class="cell-container"><div class="cell-decorator"><pre>In [6]:</pre></div><div id="d99ff25a" class="cell" data-execution_count="6">
 <pre><code>#| code-overflow: wrap
 # Apply Bilateral Filter
 bilateral_denoised = cv2.bilateralFilter(noisy_lena, d=9, sigmaColor=75, sigmaSpace=75)
@@ -473,17 +473,17 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="review_files/figure-html/cell-7-output-1.png" width="649" height="396" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-7-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="review_files/figure-html/cell-7-output-1.png" width="424" height="431" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="e604a36c" class="cell markdown">
+<div id="064b7650" class="cell markdown">
 <ol start="3" type="1">
 <li>Weinner denoiser</li>
 </ol>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [7]:</pre></div><div id="ca184b2f" class="cell" data-execution_count="7">
+<div class="cell-container"><div class="cell-decorator"><pre>In [7]:</pre></div><div id="920c252a" class="cell" data-execution_count="7">
 <pre><code>#| code-overflow: wrap
 from scipy.signal import wiener
 
@@ -498,12 +498,12 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="review_files/figure-html/cell-8-output-1.png" width="758" height="458" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="review_files/figure-html/cell-8-output-1.png" width="463" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="abd83473" class="cell markdown">
+<div id="daf76f2c" class="cell markdown">
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -523,7 +523,7 @@ Reason for worst denoising effect
 <p><em>Vary Parameters:</em> Experiment with different values for the kernel size and sigmaX to see which combination provides the best performance.</p>
 <p><em>Evaluate and Choose the Best Parameters:</em> Use the defined error metric to compare different parameter settings and select the ones with the lowest error.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [8]:</pre></div><div id="072924a3" class="cell" data-execution_count="8">
+<div class="cell-container"><div class="cell-decorator"><pre>In [8]:</pre></div><div id="a8d29c2a" class="cell" data-execution_count="8">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -531,7 +531,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -597,29 +597,29 @@ print(f"Best MSE: {best_mse}")</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="review_files/figure-html/cell-9-output-1.png" width="614" height="433" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="review_files/figure-html/cell-9-output-1.png" width="572" height="437" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-9-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="review_files/figure-html/cell-9-output-2.png" width="662" height="404" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-9-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="review_files/figure-html/cell-9-output-2.png" width="463" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Best parameters: Kernel Size = 5, SigmaX = 1
-Best MSE: 31.07871111111111</code></pre>
+<pre><code>Best parameters: Kernel Size = 3, SigmaX = 1
+Best MSE: 25.893641975308643</code></pre>
 </div>
 </div></div>
-<div id="fb58700e" class="cell markdown">
+<div id="608a885a" class="cell markdown">
 <p>Mean Square Error is a common but imperfect measure of image quality. MSE focuses on pixel-wise differences, which may not correlate well with perceptual image quality. An image can have low MSE but still appear blurry or lack important details. Newer algorithms often aim to balance MSE minimization with other perceptually relevant metrics, leading to better subjective image quality even if the MSE is slightly higher.</p>
 <p>Peak signal-to-noise ratio (PSNR) is an engineering term for the ratio between the maximum possible power of a signal and the power of corrupting noise that affects the fidelity of its representation. It is a common metric used to assess the quality of the denoised image defined as:</p>
 <p><span class="math display">\[ \text{PSNR}=10\log_{10}\left(\frac{\text{Max}_i^2}{\text{MSE}}\right)\]</span></p>
 <p>where <span class="math inline">\(\text{MAX}_i\)</span> is the maximum possible pixel value of the image, and MSE is the mean squared error between the ground truth and the denoised image. A <code>Python</code> implementation that replaces MSE with PSNR is shown below.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [9]:</pre></div><div id="c528e6d6" class="cell" data-execution_count="9">
+<div class="cell-container"><div class="cell-decorator"><pre>In [9]:</pre></div><div id="478b8af8" class="cell" data-execution_count="9">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -627,7 +627,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -698,23 +698,23 @@ print(f"Best PSNR: {best_psnr} dB")</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="review_files/figure-html/cell-10-output-1.png" width="614" height="433" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-10-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="review_files/figure-html/cell-10-output-1.png" width="572" height="437" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-10-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="review_files/figure-html/cell-10-output-2.png" width="662" height="404" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-10-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="review_files/figure-html/cell-10-output-2.png" width="463" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Best parameters: Kernel Size = 5, SigmaX = 1
-Best PSNR: 33.20002474204338 dB</code></pre>
+<pre><code>Best parameters: Kernel Size = 3, SigmaX = 1
+Best PSNR: 34.01536514475295 dB</code></pre>
 </div>
 </div></div>
-<div id="75325c9e" class="cell markdown">
+<div id="c2fcc4fb" class="cell markdown">
 <p>In this experiment, both the approaches produced the same result!</p>
 <p>Next we consider a more general situation. Suppose 20 noisy images of the same clean image are avaiable. Need to denoise all the images at the best level. There are two approaches for this situation.</p>
 <ol type="1">
@@ -723,7 +723,7 @@ Best PSNR: 33.20002474204338 dB</code></pre>
 </ol>
 <p>Python implementation of the second approach is given below.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [10]:</pre></div><div id="ecbcbd4e" class="cell" data-execution_count="10">
+<div class="cell-container"><div class="cell-decorator"><pre>In [10]:</pre></div><div id="9ce72622" class="cell" data-execution_count="10">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -731,7 +731,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # Load the Lena image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -816,26 +816,26 @@ for j in range(num_noisy_images, rows * cols):
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>Best parameters: Kernel Size = 5, SigmaX = 1
-Best Average PSNR: 33.21001689546172 dB</code></pre>
+<pre><code>Best parameters: Kernel Size = 3, SigmaX = 1
+Best Average PSNR: 34.07920191455078 dB</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-11-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="review_files/figure-html/cell-11-output-2.png" width="758" height="442" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-11-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="review_files/figure-html/cell-11-output-2.png" width="681" height="451" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
 </section>
-<div id="e6a5de70" class="cell markdown">
+<div id="5422956d" class="cell markdown">
 <section id="landing-to-the-background-of-the-article" class="level2">
 <h2 class="anchored" data-anchor-id="landing-to-the-background-of-the-article">Landing to the background of the article</h2>
 <p>Is it possible to create a high-quality denoised image from a set of noisy images, even if we don’t have the clean reference image?</p>
 <p>Sure. This classical technique is commonly referred to as image denoising through <em>ensemble methods</em> or <em>image fusion</em>. The idea is to leverage the fact that each noisy image contains some useful information, and by combining these images effectively, one can obtain a better denoised result. This seems to be more realistic in application view point.</p>
 </section>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [11]:</pre></div><div id="3fbcff23" class="cell" data-execution_count="11">
+<div class="cell-container"><div class="cell-decorator"><pre>In [11]:</pre></div><div id="c51bea44" class="cell" data-execution_count="11">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -856,7 +856,7 @@ def compute_mse(image1, image2):
     return mean_squared_error(image1.flatten(), image2.flatten())
 
 # Load the clean image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Number of noisy images to generate
 num_noisy_images = 20
@@ -938,26 +938,26 @@ print(f"Best Average MSE: {best_mse}")</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="review_files/figure-html/cell-12-output-1.png" width="758" height="457" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-12-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="review_files/figure-html/cell-12-output-1.png" width="729" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-12-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="review_files/figure-html/cell-12-output-2.png" width="758" height="473" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-12-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="review_files/figure-html/cell-12-output-2.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Best parameters: Kernel Size = 9, SigmaX = 2
-Best Average MSE: 4.579880935672514</code></pre>
+Best Average MSE: 4.403501461988306</code></pre>
 </div>
 </div></div>
-<div id="98aa3630" class="cell markdown">
+<div id="bb679f38" class="cell markdown">
 <p>Instead of MSE, the PSNR metric can be used. Here the comparison is with another <em>noisy image</em>.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [12]:</pre></div><div id="073f1ef3" class="cell" data-execution_count="12">
+<div class="cell-container"><div class="cell-decorator"><pre>In [12]:</pre></div><div id="8d377e31" class="cell" data-execution_count="12">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -982,7 +982,7 @@ def add_gaussian_noise(image, sigma):
     return noisy_image.astype(np.uint8)
 
 # Load the clean image
-lena = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+lena = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Number of noisy images to generate
 num_noisy_images = 20
@@ -1064,23 +1064,23 @@ print(f"Best Average PSNR: {best_psnr}")</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="review_files/figure-html/cell-13-output-1.png" width="758" height="457" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-13-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="review_files/figure-html/cell-13-output-1.png" width="729" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="review_files/figure-html/cell-13-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="review_files/figure-html/cell-13-output-2.png" width="758" height="473" class="figure-img"></a></p>
+<p><a href="review_files/figure-html/cell-13-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="review_files/figure-html/cell-13-output-2.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Best parameters: Kernel Size = 9, SigmaX = 2
-Best Average PSNR: 41.47020361226686</code></pre>
+Best Average PSNR: 41.71662403691973</code></pre>
 </div>
 </div></div>
-<div id="114cf48e" class="cell markdown">
+<div id="6252e93e" class="cell markdown">
 <p>In this article, authors refer that, in the context of image denoising with Gaussian noise, <em>Generalized Cross Validation (GCV)</em> and **Stein’s Unbiased Risk Estimate (SURE)* are used to estimate the performance of denoising algorithms without requiring a clean reference image. A review of these topics from fundamentals of image processing provides following key insights.</p>
 <section id="generalized-cross-validation-gcv" class="level3">
 <h3 class="anchored" data-anchor-id="generalized-cross-validation-gcv">Generalized Cross Validation (GCV)</h3>
@@ -1134,7 +1134,7 @@ Note
 <p>Python implementation of <em>GCV</em> is given below.</p>
 </section>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [13]:</pre></div><div id="6cdea6dd" class="cell" data-execution_count="13">
+<div class="cell-container"><div class="cell-decorator"><pre>In [13]:</pre></div><div id="736d727f" class="cell" data-execution_count="13">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -1142,7 +1142,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1225,22 +1225,22 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="review_files/figure-html/cell-14-output-1.png" width="758" height="473" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="review_files/figure-html/cell-14-output-1.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="9a09d70a" class="cell markdown">
+<div id="73217e2a" class="cell markdown">
 <p>Python implementation of SURE approach is shown below.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [14]:</pre></div><div id="fd4e461d" class="cell" data-execution_count="14">
+<div class="cell-container"><div class="cell-decorator"><pre>In [14]:</pre></div><div id="6b822273" class="cell" data-execution_count="14">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1305,12 +1305,12 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="review_files/figure-html/cell-15-output-1.png" width="758" height="473" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-15-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="review_files/figure-html/cell-15-output-1.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="fe6ae73c" class="cell markdown">
+<div id="85199575" class="cell markdown">
 <p>In this experiment, both the approach come with same parameters!</p>
 <p>Cross-validation is used to assess how well a model (or in this case, a denoising algorithm with specific parameters <span class="math inline">\(k\)</span> and <code>sigmaX</code>) generalizes to unseen data. For image denoising, it involves splitting the data into training and validation sets to evaluate the performance of different parameter settings.</p>
 <p>In the context of denoising, we would use noisy images with known parameters to select the best parameters by evaluating how well the denoising algorithm performs on validation images. This process helps in selecting parameters that <em>generalize</em> well across different noisy samples.</p>
@@ -1323,7 +1323,7 @@ plt.show()</code></pre>
 <p>To optimize the cost function without using neural networks, we can directly minimize the loss function using optimization techniques (<code>minimize</code> function from <code>scipy</code> library). A python implementation of this parameter tuning is given below.</p>
 </section>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [15]:</pre></div><div id="100f172e" class="cell" data-execution_count="15">
+<div class="cell-container"><div class="cell-decorator"><pre>In [15]:</pre></div><div id="da2e9411" class="cell" data-execution_count="15">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -1331,7 +1331,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1391,15 +1391,15 @@ Optimized sigma: 1.0</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-16-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="review_files/figure-html/cell-16-output-3.png" width="662" height="419" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-16-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="review_files/figure-html/cell-16-output-3.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="970ef63d" class="cell markdown">
+<div id="7fecd5b9" class="cell markdown">
 <p>A from the scratch mathematical implementation of gradient and the gradient descent algorithm is shown below.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [16]:</pre></div><div id="06f68ded" class="cell" data-execution_count="16">
+<div class="cell-container"><div class="cell-decorator"><pre>In [16]:</pre></div><div id="bca09963" class="cell" data-execution_count="16">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -1408,7 +1408,7 @@ from scipy.optimize import minimize
 from sklearn.metrics import mean_squared_error
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1485,7 +1485,7 @@ denoised_image_sgd = denoiser(optimized_theta_sgd, noisy_image1)
 psnr_sgd = compute_psnr(clean_image, denoised_image_sgd)
 psnr_noisy=compute_psnr(clean_image, noisy_image1)
 # Plot the results
-fig, ax = plt.subplots(1, 4, figsize=(10, 5))
+fig, ax = plt.subplots(1, 4, figsize=(12, 8))
 # Plot 0: Noisy image y
 ax[0].imshow(noisy_image1, cmap='gray')
 ax[0].set_title(f'Noisy image-1, PSNR: {psnr_noisy:.2f} dB')
@@ -1510,7 +1510,7 @@ plt.tight_layout()
 plt.show()</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Optimization terminated successfully.
-         Current function value: 90.307700
+         Current function value: 90.287438
          Iterations: 0
          Function evaluations: 3
          Gradient evaluations: 1</code></pre>
@@ -1518,15 +1518,15 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-17-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="review_files/figure-html/cell-17-output-2.png" width="964" height="164" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-17-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="review_files/figure-html/cell-17-output-2.png" width="1142" height="309" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="32e290b6" class="cell markdown">
+<div id="7685f2e7" class="cell markdown">
 <p>An alternative approach is to use the Gradient descent algorithm form <code>sklearn</code> library.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [17]:</pre></div><div id="4bde4a40" class="cell" data-execution_count="17">
+<div class="cell-container"><div class="cell-decorator"><pre>In [17]:</pre></div><div id="48b1865a" class="cell" data-execution_count="17">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -1534,7 +1534,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1604,15 +1604,15 @@ plt.show()</code></pre>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-18-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="review_files/figure-html/cell-18-output-2.png" width="662" height="419" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-18-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="review_files/figure-html/cell-18-output-2.png" width="433" height="471" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="7df32fbf" class="cell markdown">
+<div id="a6a970eb" class="cell markdown">
 <p>This attempt is to Compare the quality of denoising with SG descent method.</p>
 </div>
-<div class="cell-container"><div class="cell-decorator"><pre>In [18]:</pre></div><div id="72bcb77d" class="cell" data-execution_count="18">
+<div class="cell-container"><div class="cell-decorator"><pre>In [18]:</pre></div><div id="8e8c1912" class="cell" data-execution_count="18">
 <pre><code>#| code-overflow: wrap
 import numpy as np
 import cv2
@@ -1621,7 +1621,7 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 
 # Load the clean image
-clean_image = cv2.imread('input.jpg', cv2.IMREAD_GRAYSCALE)
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
 
 # Function to add Gaussian noise
 def add_gaussian_noise(image, sigma):
@@ -1694,17 +1694,17 @@ plt.axis('off')
 plt.tight_layout()
 plt.show()</code></pre>
 <div class="cell-output cell-output-stdout">
-<pre><code>PSNR value between the clean image and the denoised image: 31.44 dB</code></pre>
+<pre><code>PSNR value between the clean image and the denoised image: 31.81 dB</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div class="">
 <figure class="figure">
-<p class=""><a href="review_files/figure-html/cell-19-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="review_files/figure-html/cell-19-output-2.png" width="758" height="455" class="figure-img"></a></p>
+<p class=""><a href="review_files/figure-html/cell-19-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="review_files/figure-html/cell-19-output-2.png" width="450" height="470" class="figure-img"></a></p>
 </figure>
 </div>
 </div>
 </div></div>
-<div id="eb933260" class="cell markdown">
+<div id="5327a8bc" class="cell markdown">
 <p>Instead of using the default optimizer, let’s try the finite difference approach for numerical differentiation. This approach is purely depended on the function values rather than its mathematical definition. So, computationally it will be more dependable. Improved code with fine tuning gradient descent with finite difference is shown below.</p>
 </div>
 <div class="cell-container"><div class="cell-decorator"><pre>In [19]:</pre></div><div id="cell-fig-denoising-plot" class="cell" data-execution_count="19">
@@ -2223,7 +2223,7 @@ Example of denoising results.
 </div>
 </div>
 </div></div>
-<div id="5786cbb3" class="cell markdown">
+<div id="b741b1d6" class="cell markdown">
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2659,7 +2659,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","openEffect":"zoom","loop":false});
+</script>  </div> <!-- /content -->  <script>var lightboxQuarto = GLightbox({"openEffect":"zoom","descPosition":"bottom","loop":false,"closeEffect":"zoom","selector":".lightbox"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

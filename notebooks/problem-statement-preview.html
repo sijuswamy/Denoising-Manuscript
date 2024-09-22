@@ -7,7 +7,7 @@
 
     <meta name="author" content="Siju K S">
 
-    <title>Problem Statement</title>
+    <title>A study on Automatic Turning of Denoising Algorithm Parameters in Medical Images</title>
     <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -20,7 +20,27 @@
         margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
         vertical-align: middle;
       }
-    </style>
+      /* CSS for citations */
+      div.csl-bib-body { }
+      div.csl-entry {
+        clear: both;
+        margin-bottom: 0em;
+      }
+      .hanging-indent div.csl-entry {
+        margin-left:2em;
+        text-indent:-2em;
+      }
+      div.csl-left-margin {
+        min-width:2em;
+        float:left;
+      }
+      div.csl-right-inline {
+        margin-left:2em;
+        padding-left:1em;
+      }
+      div.csl-indent {
+        margin-left: 2em;
+      }    </style>
 
     <style>
       body.hypothesis-enabled #quarto-embed-header {
@@ -135,7 +155,7 @@
     <div id="quarto-embed-header" class="headroom fixed-top bg-primary">
       
       <a onclick="window.quartoBackToArticle(); return false;" class="btn btn-primary quarto-back-link" href=""><i class="bi bi-caret-left"></i> Back to Article</a>
-      <h6><i class="bi bi-journal-code"></i> Problem Statement</h6>
+      <h6><i class="bi bi-journal-code"></i> A study on Automatic Turning of Denoising Algorithm Parameters in Medical Images</h6>
 
             <a href="../notebooks/problem-statement.qmd" class="btn btn-primary quarto-download-embed" download="problem-statement.qmd">Download Source</a>
           </div>
@@ -143,7 +163,7 @@
      <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Problem Statement</h1>
+      <h1 class="title">A study on Automatic Turning of Denoising Algorithm Parameters in Medical Images</h1>
           </div>
 
     
@@ -191,6 +211,7 @@
    
   <ul>
   <li><a href="#problem-statement-for-the-research-work" id="toc-problem-statement-for-the-research-work" class="nav-link active" data-scroll-target="#problem-statement-for-the-research-work">Problem Statement for the Research Work</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
 </div>
@@ -201,23 +222,36 @@
        <section id="problem-statement-for-the-research-work" class="level1">
 <h1>Problem Statement for the Research Work</h1>
 <p>Noise presents a major barrier to accurate interpretation in medical imaging, particularly in resource-limited healthcare environments where access to advanced, noise-resistant imaging technologies remains restricted. Despite the efficiency of modern high-resolution imaging systems like MRI and CT in reducing noise, their high cost and limited availability prevent widespread implementation, especially in public health infrastructures. Thus, enhancing the diagnostic quality of existing imaging modalities via advanced denoising methods is both an essential and sustainable solution for improving global healthcare.</p>
-<p>Conventional denoising algorithms, especially deep learning-based approaches, often rely on the availability of clean, noise-free reference images for training. In medical imaging, such ground-truth data is rarely available, complicating efforts to denoise noisy medical scans effectively. Although recent methods—such as Noise2Noise, Noisier2Noise, and Recorrupted-to-Recorrupted—have demonstrated success in learning from noisy data without clean references, they remain largely constrained to synthetic and general-purpose image datasets (Lehtinen, 2018; Moran et al., 2020 ; Pang et al., 2021). The complexity and specificity of medical image noise, often non-linear in nature, present challenges these methods are ill-equipped to handle.</p>
-<p>In their recent work, Floquet et al.&nbsp;(2024) introduced an automatic tuning mechanism for denoising algorithms that circumvents the need for ground-truth images, employing Mean Squared Error (MSE) as the loss function and optimizing through gradient descent. While this approach has demonstrated effectiveness on datasets such as BSD400, particularly in linear noise scenarios, its gradient-based optimization framework faces challenges when applied to non-linear noise models, which are prevalent in medical images.</p>
+<p>Conventional denoising algorithms <span class="citation" data-cites="dogra2018survey">(<a href="#ref-dogra2018survey" role="doc-biblioref">Dogra, Agrawal, and Sohi 2018</a>)</span>, especially deep learning-based approaches, often rely on the availability of clean, noise-free reference images for training <span class="citation" data-cites="9210208">(<a href="#ref-9210208" role="doc-biblioref">Xu et al. 2020</a>)</span>. In medical imaging, such ground-truth data is rarely available, complicating efforts to denoise noisy medical scans effectively. Recent research has explored automated approaches to optimize denoising parameters. For instance, Zhu and Milanfar <span class="citation" data-cites="5484579">(<a href="#ref-5484579" role="doc-biblioref">Zhu and Milanfar 2010</a>)</span> developed a no-reference measure for automatic parameter selection, while Ramani et al. <span class="citation" data-cites="4598837">(<a href="#ref-4598837" role="doc-biblioref">Ramani, Blu, and Unser 2008</a>)</span> proposed Monte-Carlo optimization for regularization parameters. Although recent works—such as <code>Noise2Noise</code>, <code>Noisier2Noise</code>, and <code>Recorrupted-to-Recorrupted</code>—have demonstrated success in learning from noisy data without clean references, they remain largely constrained to synthetic and general-purpose image datasets with training phases (<span class="citation" data-cites="lehtinen2018noise2noise">(<a href="#ref-lehtinen2018noise2noise" role="doc-biblioref">Lehtinen 2018</a>)</span>; <span class="citation" data-cites="9156650">(<a href="#ref-9156650" role="doc-biblioref">Moran et al. 2020</a>)</span>; <span class="citation" data-cites="9577798">(<a href="#ref-9577798" role="doc-biblioref">Pang et al. 2021</a>)</span>). The complexity and specificity of medical image noise, often non-linear in nature, present challenges these methods are ill-equipped to handle.</p>
+<p>In their recent work, Floquet et al.<span class="citation" data-cites="floquet:hal-04344047">(<a href="#ref-floquet:hal-04344047" role="doc-biblioref">Floquet et al. 2024</a>)</span> introduced an automatic tuning mechanism for denoising algorithms that circumvents the need for ground-truth images, employing Mean Squared Error (MSE) as the loss function and optimizing through gradient descent. While this approach has demonstrated effectiveness on datasets such as BSD400, particularly in linear noise scenarios, its gradient-based optimization framework faces challenges when applied to non-linear noise models, which are prevalent in medical images.</p>
 <p>Building on this foundation, we propose to extend Floquet et al.’s framework to tackle non-linear noise by incorporating nature-inspired optimization methods—such as genetic algorithms and particle swarm optimization. These techniques are well-suited for complex, non-linear optimization landscapes, overcoming the limitations posed by gradient descent. Our approach aims to enhance the robustness of denoising algorithms, particularly in the context of medical imaging, where noise is often more intricate, and ground-truth clean images are typically unavailable. This advancement holds potential not only for improved diagnostic accuracy but also for making high-quality medical imaging more accessible in resource-constrained healthcare environments, aligning with broader goals of sustainability and equity in global health systems.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-dogra2018survey" class="csl-entry" role="listitem">
+Dogra, Bhawna Goyal Ayush, Sunil Agrawal, and BS Sohi. 2018. <span>“A Survey on the Image Denoising to Enhance Medical Images.”</span> <em>Biosciences Biotechnology Research Asia</em> 15 (3): 501. https://doi.org/<a href="http://dx.doi.org/10.13005/bbra/2655">http://dx.doi.org/10.13005/bbra/2655</a>.
 </div>
-<div class="callout-title-container flex-fill">
-Optinal write-up
+<div id="ref-floquet:hal-04344047" class="csl-entry" role="listitem">
+Floquet, Arthur, Sayantan Dutta, Emmanuel Soubies, Duong-Hung Pham, Denis Kouamé, and Denis Kouame. 2024. <span>“<span class="nocase">Automatic Tuning of Denoising Algorithms Parameters without Ground Truth</span>.”</span> <em><span>IEEE Signal Processing Letters</span></em> 31 (January): 381–85. <a href="https://doi.org/10.1109/LSP.2024.3354554">https://doi.org/10.1109/LSP.2024.3354554</a>.
 </div>
+<div id="ref-lehtinen2018noise2noise" class="csl-entry" role="listitem">
+Lehtinen, J. 2018. <span>“Noise2noise: Learning Image Restoration Without Clean Data.”</span> <em>arXiv Preprint arXiv:1803.04189</em>.
 </div>
-<div class="callout-body-container callout-body">
-<p>Floquet et al.&nbsp;(2024) introduced an innovative approach for automatic parameter tuning of denoising algorithms, circumventing the need for ground-truth images. Their method, which relies on Mean Squared Error (MSE) as the loss function and gradient descent for optimization, has shown efficacy in managing linear noise and was benchmarked against state-of-the-art models such as Noise2Noise, Noisier2Noise, and Recorrupted-to-Recorrupted using the BSD400 dataset.</p>
-<p>Despite these successes, medical imaging presents unique challenges, as noise in these contexts is often non-linear and more complex. Gradient descent, though efficient in linear scenarios, struggles to optimize such non-linearities, highlighting the need for more versatile optimization techniques.</p>
-<p>In response to this limitation, we propose extending Floquet et al.’s framework by integrating nature-inspired optimization algorithms, including genetic algorithms and particle swarm optimization, specifically tailored for non-linear noise scenarios in medical images. These methods are particularly adept at exploring multi-dimensional, non-convex search spaces, providing a robust alternative to traditional gradient-based methods.</p>
-<p>This approach will not only enhance the accuracy and robustness of denoising in medical imaging but also address the broader issue of accessibility. In regions where advanced imaging technologies are not available, improving the performance of existing systems becomes crucial. By refining denoising techniques, we aim to support more accurate diagnostics in resource-constrained healthcare settings, thereby contributing to more sustainable and equitable healthcare solutions globally.</p>
+<div id="ref-9156650" class="csl-entry" role="listitem">
+Moran, Nick, Dan Schmidt, Yu Zhong, and Patrick Coady. 2020. <span>“Noisier2Noise: Learning to Denoise from Unpaired Noisy Data.”</span> In <em>2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)</em>, 12061–69. <a href="https://doi.org/10.1109/CVPR42600.2020.01208">https://doi.org/10.1109/CVPR42600.2020.01208</a>.
+</div>
+<div id="ref-9577798" class="csl-entry" role="listitem">
+Pang, Tongyao, Huan Zheng, Yuhui Quan, and Hui Ji. 2021. <span>“Recorrupted-to-Recorrupted: Unsupervised Deep Learning for Image Denoising.”</span> In <em>2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)</em>, 2043–52. <a href="https://doi.org/10.1109/CVPR46437.2021.00208">https://doi.org/10.1109/CVPR46437.2021.00208</a>.
+</div>
+<div id="ref-4598837" class="csl-entry" role="listitem">
+Ramani, Sathish, Thierry Blu, and Michael Unser. 2008. <span>“Monte-Carlo Sure: A Black-Box Optimization of Regularization Parameters for General Denoising Algorithms.”</span> <em>IEEE Transactions on Image Processing</em> 17 (9): 1540–54. <a href="https://doi.org/10.1109/TIP.2008.2001404">https://doi.org/10.1109/TIP.2008.2001404</a>.
+</div>
+<div id="ref-9210208" class="csl-entry" role="listitem">
+Xu, Jun, Yuan Huang, Ming-Ming Cheng, Li Liu, Fan Zhu, Zhou Xu, and Ling Shao. 2020. <span>“Noisy-as-Clean: Learning Self-Supervised Denoising from Corrupted Image.”</span> <em>IEEE Transactions on Image Processing</em> 29: 9316–29. <a href="https://doi.org/10.1109/TIP.2020.3026622">https://doi.org/10.1109/TIP.2020.3026622</a>.
+</div>
+<div id="ref-5484579" class="csl-entry" role="listitem">
+Zhu, Xiang, and Peyman Milanfar. 2010. <span>“Automatic Parameter Selection for Denoising Algorithms Using a No-Reference Measure of Image Content.”</span> <em>IEEE Transactions on Image Processing</em> 19 (12): 3116–32. <a href="https://doi.org/10.1109/TIP.2010.2052820">https://doi.org/10.1109/TIP.2010.2052820</a>.
 </div>
 </div>
 </section>
