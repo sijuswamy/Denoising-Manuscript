@@ -1824,4 +1824,641 @@ In all these fine-tuning implementations, we started with a initial $\theta$, wh
 
 :::
 
+## Using Nature Inspired Optimization Algorithms to Minimize the Loss Function
 
+```{python}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+# Load the clean image
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to ensure valid kernel size (odd and positive)
+def valid_kernel_size(size):
+    size = int(size)
+    if size % 2 == 0:
+        size += 1
+    return max(size, 1)
+
+# Function to compute the cost (error) for the GA
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = valid_kernel_size(kernel_size)
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Genetic Algorithm for optimization
+def genetic_algorithm(noisy_image1, noisy_image2, pop_size=20, generations=50, mutation_rate=0.1):
+    # Initialize population with random values for kernel size and sigma
+    population = [[random.uniform(1, 50), random.uniform(0.1, 5)] for _ in range(pop_size)]
+    
+    for generation in range(generations):
+        # Evaluate fitness (minimize the cost function)
+        fitness_scores = [cost_function(individual, noisy_image1, noisy_image2) for individual in population]
+        
+        # Sort population by fitness (lower is better)
+        population = [individual for _, individual in sorted(zip(fitness_scores, population))]
+        
+        # Select the top individuals for crossover
+        top_individuals = population[:pop_size // 2]
+        
+        # Crossover: Create new individuals by combining parts of top individuals
+        offspring = []
+        for _ in range(pop_size // 2):
+            parent1, parent2 = random.sample(top_individuals, 2)
+            child = [
+                (parent1[0] + parent2[0]) / 2,  # Average of parents' kernel size
+                (parent1[1] + parent2[1]) / 2   # Average of parents' sigma
+            ]
+            offspring.append(child)
+        
+        # Mutation: Randomly alter some individuals
+        for individual in offspring:
+            if random.random() < mutation_rate:
+                individual[0] += random.uniform(-1, 1)  # Mutate kernel size
+                individual[1] += random.uniform(-0.1, 0.1)  # Mutate sigma
+        
+        # Combine top individuals and offspring to form new population
+        population = top_individuals + offspring
+        
+        # Ensure kernel sizes are valid
+        for individual in population:
+            individual[0] = valid_kernel_size(individual[0])
+        
+        # Print progress
+        best_fitness = fitness_scores[0]
+        print(f'Generation {generation+1}, Best Fitness: {best_fitness:.4f}')
+    
+    # Return the best solution (lowest cost)
+    return population[0]
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Use Genetic Algorithm to optimize kernel size and sigma
+optimized_theta_ga = genetic_algorithm(noisy_images[0], noisy_images[1])
+
+# Apply the optimized parameters to denoise the image
+optimized_denoised_image_ga = apply_gaussian_smoothing(noisy_images[0], valid_kernel_size(optimized_theta_ga[0]), optimized_theta_ga[1])
+
+# Compute PSNR values
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    max_pixel = 255.0
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+psnr_ga = compute_psnr(optimized_denoised_image_ga, clean_image)
+psnr_noisy = compute_psnr(noisy_images[0], clean_image)
+
+# Display results
+plt.figure(figsize=(8, 5))
+
+# Plot noisy image
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy Image\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+
+# Plot denoised image by Genetic Algorithm
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_ga, cmap='gray')
+plt.title(f'Genetic Algorithm\nPSNR: {psnr_ga:.2f}')
+plt.axis('off')
+
+# Plot clean image
+plt.subplot(2, 2, 3)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Using PSO
+
+```{python}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+# Load the clean image
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)  # Clip values to [0, 255]
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute the cost (error) based on PSNR
+def cost_function(theta, noisy_image, clean_image):
+    kernel_size, sigmaX = theta
+    denoised_image = apply_gaussian_smoothing(noisy_image, kernel_size, sigmaX)
+    psnr = compute_psnr(denoised_image, clean_image)
+    return -psnr  # We minimize the negative PSNR for maximization
+
+# Compute PSNR
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    if mse == 0:
+        return 100
+    return 20 * np.log10(255.0 / np.sqrt(mse))
+
+# Particle Swarm Optimization (PSO)
+def pso(noisy_image, clean_image, pop_size=30, max_iter=50, w=0.5, c1=2, c2=2):
+    # Initialize the particles
+    particles = [[random.uniform(1, 50), random.uniform(0.1, 5)] for _ in range(pop_size)]
+    velocities = [[random.uniform(-1, 1), random.uniform(-1, 1)] for _ in range(pop_size)]
+    
+    # Initialize personal best and global best positions
+    personal_best = particles.copy()
+    global_best = min(personal_best, key=lambda p: cost_function(p, noisy_image, clean_image))
+    
+    for iteration in range(max_iter):
+        for i in range(pop_size):
+            # Update velocity
+            r1, r2 = random.random(), random.random()
+            velocities[i][0] = w * velocities[i][0] + c1 * r1 * (personal_best[i][0] - particles[i][0]) + c2 * r2 * (global_best[0] - particles[i][0])
+            velocities[i][1] = w * velocities[i][1] + c1 * r1 * (personal_best[i][1] - particles[i][1]) + c2 * r2 * (global_best[1] - particles[i][1])
+            
+            # Update particle positions
+            particles[i][0] += velocities[i][0]
+            particles[i][1] += velocities[i][1]
+            
+            # Apply boundary conditions to the parameters
+            particles[i][0] = max(1, min(50, particles[i][0]))  # Ensure kernel size is within valid range
+            particles[i][1] = max(0.1, min(5, particles[i][1]))  # Ensure sigmaX is within valid range
+            
+            # Update personal best
+            if cost_function(particles[i], noisy_image, clean_image) < cost_function(personal_best[i], noisy_image, clean_image):
+                personal_best[i] = particles[i]
+        
+        # Update global best
+        current_global_best = min(personal_best, key=lambda p: cost_function(p, noisy_image, clean_image))
+        if cost_function(current_global_best, noisy_image, clean_image) < cost_function(global_best, noisy_image, clean_image):
+            global_best = current_global_best
+        
+        print(f'Iteration {iteration+1}/{max_iter}, Best PSNR: {-cost_function(global_best, noisy_image, clean_image):.2f}')
+    
+    return global_best
+
+# Add Gaussian noise to the clean image
+sigma_values = 15  # Define the noise level
+noisy_image = add_gaussian_noise(clean_image, sigma_values)
+
+# Perform PSO optimization
+best_params = pso(noisy_image, clean_image)
+
+# Apply Gaussian smoothing using the best parameters found by PSO
+denoised_image_pso = apply_gaussian_smoothing(noisy_image, best_params[0], best_params[1])
+
+# Calculate PSNR values
+psnr_pso = compute_psnr(denoised_image_pso, clean_image)
+psnr_noisy = compute_psnr(noisy_image, clean_image)
+
+# Display results
+plt.figure(figsize=(10, 5))
+
+# Noisy image
+plt.subplot(1, 3, 1)
+plt.imshow(noisy_image, cmap='gray')
+plt.title(f'Noisy Image\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+
+# Denoised image (PSO)
+plt.subplot(1, 3, 2)
+plt.imshow(denoised_image_pso, cmap='gray')
+plt.title(f'PSO Denoised Image\nPSNR: {psnr_pso:.2f}')
+plt.axis('off')
+
+# Clean image
+plt.subplot(1, 3, 3)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+### Performance Comparison of Deterministic and Stochastic Algorithms
+
+```{python}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+from scipy.optimize import minimize
+
+# Load the clean image
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute PSNR
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    if mse == 0:
+        return 100
+    return 20 * np.log10(255.0 / np.sqrt(mse))
+
+# Objective function to minimize (negative PSNR)
+def cost_function(theta, noisy_image, clean_image):
+    kernel_size, sigmaX = theta
+    denoised_image = apply_gaussian_smoothing(noisy_image, kernel_size, sigmaX)
+    psnr = compute_psnr(denoised_image, clean_image)
+    return -psnr
+
+# GA implementation
+def genetic_algorithm(noisy_image, clean_image, pop_size=20, generations=50):
+    # Initialize population
+    population = [[random.uniform(1, 50), random.uniform(0.1, 5)] for _ in range(pop_size)]
+    for gen in range(generations):
+        population = sorted(population, key=lambda p: cost_function(p, noisy_image, clean_image))
+        # Selection
+        population = population[:pop_size//2]
+        # Crossover
+        offspring = []
+        for _ in range(pop_size//2):
+            parent1, parent2 = random.sample(population, 2)
+            child = [(p1 + p2) / 2 for p1, p2 in zip(parent1, parent2)]
+            offspring.append(child)
+        # Mutation
+        for child in offspring:
+            if random.random() < 0.1:
+                child[random.randint(0, 1)] += random.uniform(-1, 1)
+        population.extend(offspring)
+    best_params = min(population, key=lambda p: cost_function(p, noisy_image, clean_image))
+    return best_params
+
+# SGD implementation
+def stochastic_gradient_descent(noisy_image, clean_image, init_params, learning_rate=0.01, iterations=100):
+    params = np.array(init_params)
+    for i in range(iterations):
+        gradient = np.zeros_like(params)
+        for j in range(len(params)):
+            delta = np.zeros_like(params)
+            delta[j] = 1e-5
+            gradient[j] = (cost_function(params + delta, noisy_image, clean_image) - cost_function(params, noisy_image, clean_image)) / 1e-5
+        params -= learning_rate * gradient
+        params = np.clip(params, [1, 0.1], [50, 5])
+    return params
+
+# PSO implementation
+def pso(noisy_image, clean_image, pop_size=30, max_iter=50, w=0.5, c1=2, c2=2):
+    particles = [[random.uniform(1, 50), random.uniform(0.1, 5)] for _ in range(pop_size)]
+    velocities = [[random.uniform(-1, 1), random.uniform(-1, 1)] for _ in range(pop_size)]
+    personal_best = particles.copy()
+    global_best = min(personal_best, key=lambda p: cost_function(p, noisy_image, clean_image))
+
+    for iteration in range(max_iter):
+        for i in range(pop_size):
+            r1, r2 = random.random(), random.random()
+            velocities[i][0] = w * velocities[i][0] + c1 * r1 * (personal_best[i][0] - particles[i][0]) + c2 * r2 * (global_best[0] - particles[i][0])
+            velocities[i][1] = w * velocities[i][1] + c1 * r1 * (personal_best[i][1] - particles[i][1]) + c2 * r2 * (global_best[1] - particles[i][1])
+
+            particles[i][0] += velocities[i][0]
+            particles[i][1] += velocities[i][1]
+            particles[i] = np.clip(particles[i], [1, 0.1], [50, 5])
+
+            if cost_function(particles[i], noisy_image, clean_image) < cost_function(personal_best[i], noisy_image, clean_image):
+                personal_best[i] = particles[i]
+
+        current_global_best = min(personal_best, key=lambda p: cost_function(p, noisy_image, clean_image))
+        if cost_function(current_global_best, noisy_image, clean_image) < cost_function(global_best, noisy_image, clean_image):
+            global_best = current_global_best
+    return global_best
+
+# Main Execution
+sigma_noise = 15
+noisy_image = add_gaussian_noise(clean_image, sigma_noise)
+
+# Perform optimizations
+best_params_ga = genetic_algorithm(noisy_image, clean_image)
+best_params_sgd = stochastic_gradient_descent(noisy_image, clean_image, [25, 1.5])
+best_params_pso = pso(noisy_image, clean_image)
+
+# Apply Gaussian smoothing using the optimized parameters
+denoised_ga = apply_gaussian_smoothing(noisy_image, best_params_ga[0], best_params_ga[1])
+denoised_sgd = apply_gaussian_smoothing(noisy_image, best_params_sgd[0], best_params_sgd[1])
+denoised_pso = apply_gaussian_smoothing(noisy_image, best_params_pso[0], best_params_pso[1])
+
+# Calculate PSNR values
+psnr_noisy = compute_psnr(noisy_image, clean_image)
+psnr_ga = compute_psnr(denoised_ga, clean_image)
+psnr_sgd = compute_psnr(denoised_sgd, clean_image)
+psnr_pso = compute_psnr(denoised_pso, clean_image)
+
+# Plot the results
+plt.figure(figsize=(12, 6))
+
+plt.subplot(2, 3, 1)
+plt.imshow(noisy_image, cmap='gray')
+plt.title(f'Noisy Image\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+
+plt.subplot(2, 3, 2)
+plt.imshow(denoised_ga, cmap='gray')
+plt.title(f'GA Denoised\nPSNR: {psnr_ga:.2f}')
+plt.axis('off')
+
+plt.subplot(2, 3, 3)
+plt.imshow(denoised_sgd, cmap='gray')
+plt.title(f'SGD Denoised\nPSNR: {psnr_sgd:.2f}')
+plt.axis('off')
+
+plt.subplot(2, 3, 4)
+plt.imshow(denoised_pso, cmap='gray')
+plt.title(f'PSO Denoised\nPSNR: {psnr_pso:.2f}')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Print results
+print(f"Noisy Image PSNR: {psnr_noisy:.2f}")
+print(f"GA Optimized PSNR: {psnr_ga:.2f}")
+print(f"SGD Optimized PSNR: {psnr_sgd:.2f}")
+print(f"PSO Optimized PSNR: {psnr_pso:.2f}")
+```
+
+## Cuckoo Search Implementation
+
+```{python}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial.distance import cdist
+import random
+
+# Function to apply Gaussian smoothing
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = int(ksize)
+    if ksize % 2 == 0:
+        ksize += 1
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Function to compute the cost
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = int(max(1, kernel_size))
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = denoised_image - noisy_image2
+    return np.sum(residual ** 2)
+
+# Cuckoo Search Algorithm (CSA)
+def levy_flight(Lambda):
+    sigma1 = np.power((np.math.gamma(1 + Lambda) * np.sin(np.pi * Lambda / 2)) /
+                      (np.math.gamma((1 + Lambda) / 2) * Lambda * np.power(2, (Lambda - 1) / 2)), 1 / Lambda)
+    u = np.random.randn() * sigma1
+    v = np.random.randn()
+    step = u / np.power(np.abs(v), 1 / Lambda)
+    return step
+
+def cuckoo_search(noisy_image1, noisy_image2, n=15, pa=0.25, Lambda=1.5, max_iter=100):
+    nests = np.random.rand(n, 2) * [15, 5]  # Random initialization of solutions
+    fitness = np.array([cost_function(nests[i], noisy_image1, noisy_image2) for i in range(n)])
+    
+    best_nest = nests[np.argmin(fitness)]
+    for iter in range(max_iter):
+        # Generate new solutions via Levy flight
+        for i in range(n):
+            step_size = levy_flight(Lambda)
+            new_nest = nests[i] + step_size * (nests[i] - best_nest)
+            new_nest[0] = int(max(1, new_nest[0]))  # Ensure kernel size is valid
+            
+            # Evaluate the new solution
+            new_fitness = cost_function(new_nest, noisy_image1, noisy_image2)
+            
+            # Replace nest with new solution if it's better
+            if new_fitness < fitness[i]:
+                nests[i] = new_nest
+                fitness[i] = new_fitness
+        
+        # Abandon a fraction of worse nests
+        for i in range(n):
+            if random.random() < pa:
+                nests[i] = np.random.rand(2) * [15, 5]  # New random solution
+                fitness[i] = cost_function(nests[i], noisy_image1, noisy_image2)
+        
+        # Update the best solution
+        best_nest = nests[np.argmin(fitness)]
+        
+    return best_nest
+
+# Parameters for noisy images
+sigma_values = [10, 15]  # Different levels of Gaussian noise
+
+# Generate noisy images
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+# Applying Cuckoo Search Algorithm
+best_theta_csa = cuckoo_search(noisy_images[0], noisy_images[1], max_iter=100)
+optimized_denoised_image_csa = apply_gaussian_smoothing(noisy_images[0], best_theta_csa[0], best_theta_csa[1])
+
+# Compute PSNR values
+psnr_csa = compute_psnr(optimized_denoised_image_csa, clean_image)
+psnr_noisy = compute_psnr(noisy_images[0], clean_image)
+
+# Visualize results
+plt.figure(figsize=(8, 5))
+
+plt.subplot(2, 2, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy Image\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+
+plt.subplot(2, 2, 2)
+plt.imshow(optimized_denoised_image_csa, cmap='gray')
+plt.title(f'Cuckoo Search Optimizer\nPSNR: {psnr_csa:.2f}')
+plt.axis('off')
+
+plt.subplot(2, 2, 4)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Other NIOPT Algos
+
+
+```{python}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import differential_evolution
+from simanneal import Annealer
+from fireflyalgorithm import FireflyAlgorithm
+
+# Load the clean image
+clean_image = cv2.imread('/Denoising-Manuscript/images/first.png', cv2.IMREAD_GRAYSCALE)
+
+# Function to add Gaussian noise
+def add_gaussian_noise(image, sigma):
+    row, col = image.shape
+    mean = 0
+    gauss = np.random.normal(mean, sigma, (row, col))
+    noisy_image = image + gauss
+    noisy_image = np.clip(noisy_image, 0, 255)
+    return noisy_image.astype(np.uint8)
+
+# Function to apply Gaussian smoothing with bounds on sigmaX
+def apply_gaussian_smoothing(noisy_image, ksize, sigmaX):
+    ksize = max(3, int(ksize))  # Ensure kernel size is at least 3
+    if ksize % 2 == 0:
+        ksize += 1
+    sigmaX = max(0.1, min(sigmaX, 10))  # Clamp sigmaX between 0.1 and 10
+    return cv2.GaussianBlur(noisy_image, (ksize, ksize), sigmaX=sigmaX)
+
+# Update the bounds in optimization algorithms
+bounds = [(3, 21), (0.1, 10)]  # Kernel size and sigmaX bounds
+
+# Cost function normalization
+def cost_function(theta, noisy_image1, noisy_image2):
+    kernel_size, sigmaX = theta
+    kernel_size = max(3, int(kernel_size))  # Clamp kernel size to be valid
+    denoised_image = apply_gaussian_smoothing(noisy_image1, kernel_size, sigmaX)
+    residual = (denoised_image - noisy_image2) / 255.0  # Normalize the difference
+    return np.sum(residual ** 2)
+# Compute PSNR to evaluate image quality
+def compute_psnr(image1, image2):
+    mse = np.mean((image1 - image2) ** 2)
+    if mse == 0:  # Perfect match
+        return 100
+    max_pixel = 255.0
+    return 20 * np.log10(max_pixel / np.sqrt(mse))
+
+# Parameters for noisy images
+sigma_values = [10, 15]
+noisy_images = [add_gaussian_noise(clean_image, sigma) for sigma in sigma_values]
+
+#---------------- Simulated Annealing ------------------#
+class ImageAnnealer(Annealer):
+    def __init__(self, noisy_image1, noisy_image2, initial_state):
+        self.noisy_image1 = noisy_image1
+        self.noisy_image2 = noisy_image2
+        super().__init__(initial_state)
+    
+    def move(self):
+        # Randomly change kernel size and sigmaX
+        self.state[0] += np.random.randint(-1, 2)
+        self.state[1] += np.random.uniform(-0.5, 0.5)
+        self.state[0] = max(1, self.state[0])  # Ensure valid kernel size
+    
+    def energy(self):
+        return cost_function(self.state, self.noisy_image1, self.noisy_image2)
+
+# Initial state for annealing
+initial_state = [15, 1]
+sa_annealer = ImageAnnealer(noisy_images[0], noisy_images[1], initial_state)
+state, energy = sa_annealer.anneal()
+optimized_theta_sa = state
+optimized_denoised_image_sa = apply_gaussian_smoothing(noisy_images[0], int(optimized_theta_sa[0]), optimized_theta_sa[1])
+
+#---------------- Differential Evolution ------------------#
+bounds = [(1, 30), (0.1, 10)]
+result_de = differential_evolution(cost_function, bounds, args=(noisy_images[0], noisy_images[1]), strategy='best1bin')
+optimized_theta_de = result_de.x
+optimized_denoised_image_de = apply_gaussian_smoothing(noisy_images[0], int(optimized_theta_de[0]), optimized_theta_de[1])
+
+#---------------- Firefly Algorithm ------------------#
+firefly_algo = FireflyAlgorithm(cost_function, noisy_images[0], noisy_images[1], n_fireflies=20, max_iter=100)
+optimized_theta_fa = firefly_algo.run()
+optimized_denoised_image_fa = apply_gaussian_smoothing(noisy_images[0], int(optimized_theta_fa[0]), optimized_theta_fa[1])
+
+# Compute PSNR values for all methods
+psnr_sa = compute_psnr(optimized_denoised_image_sa, clean_image)
+psnr_de = compute_psnr(optimized_denoised_image_de, clean_image)
+psnr_fa = compute_psnr(optimized_denoised_image_fa, clean_image)
+psnr_noisy = compute_psnr(noisy_images[0], clean_image)
+
+# Visualize results
+plt.figure(figsize=(10, 7))
+
+# Noisy image
+plt.subplot(2, 3, 1)
+plt.imshow(noisy_images[0], cmap='gray')
+plt.title(f'Noisy image\nPSNR: {psnr_noisy:.2f}')
+plt.axis('off')
+
+# Simulated Annealing result
+plt.subplot(2, 3, 2)
+plt.imshow(optimized_denoised_image_sa, cmap='gray')
+plt.title(f'Simulated Annealing\nPSNR: {psnr_sa:.2f}')
+plt.axis('off')
+
+# Differential Evolution result
+plt.subplot(2, 3, 3)
+plt.imshow(optimized_denoised_image_de, cmap='gray')
+plt.title(f'Differential Evolution\nPSNR: {psnr_de:.2f}')
+plt.axis('off')
+
+# Firefly Algorithm result
+plt.subplot(2, 3, 4)
+plt.imshow(optimized_denoised_image_fa, cmap='gray')
+plt.title(f'Firefly Algorithm\nPSNR: {psnr_fa:.2f}')
+plt.axis('off')
+
+# Clean Image
+plt.subplot(2, 3, 5)
+plt.imshow(clean_image, cmap='gray')
+plt.title('Clean Image')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
